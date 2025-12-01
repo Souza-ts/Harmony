@@ -162,7 +162,6 @@ function updateActiveLyric(currentTime) {
     // Encontrar linha ativa baseada no tempo
     lines.forEach((line, index) => {
         const lineTime = parseInt(line.dataset.time);
-        line.classList.remove('active');
         
         // Ativar a linha se o tempo atual for >= ao tempo da linha
         if (lineTime <= currentTime && !foundActive) {
