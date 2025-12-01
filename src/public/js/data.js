@@ -119,7 +119,7 @@ const musicLibrary = [
         artist: "Ariana Grande",
         album: "Eternal Sunshine",
         duration: 335, // 3:35 minutos
-        file: "src/assets/song/yes, and?.mp3",
+        file: "src/assets/song/yes and.mp3",
         cover: "src/assets/cover/Eternal Sunshine.jpg",
         lyrics: [
             { time: 0, text: "" },
