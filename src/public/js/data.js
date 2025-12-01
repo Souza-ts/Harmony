@@ -5,7 +5,7 @@ const musicLibrary = [
         title: "deja vu",
         artist: "Olivia Rodrigo",
         album: "SOUR",
-        duration: 217,
+        duration: 351,
         file: "src/assets/song/DejaVu.mp3",
         cover: "src/assets/cover/Sour.jpg",
         favorite: false,
@@ -59,7 +59,7 @@ const musicLibrary = [
         title: "Happier Than Ever",
         artist: "Billie Eilish",
         album: "Happier Than Ever",
-        duration: 299,
+        duration: 458,
         file: "src/assets/song/Happier Than Ever.mp3",
         cover: "src/assets/cover/Happier Than Ever.jpg",
         favorite: false,
@@ -121,7 +121,7 @@ const musicLibrary = [
         title: "yes, and?",
         artist: "Ariana Grande",
         album: "Eternal Sunshine",
-        duration: 268,
+        duration: 335,
         file: "src/assets/song/yes and.mp3",
         cover: "src/assets/cover/Eternal Sunshine.jpg",
         favorite: false,
@@ -188,6 +188,7 @@ let isShuffle = false;
 let isRepeat = false;
 let autoScrollEnabled = true;
 let currentTime = 0;
+let lastActiveLineIndex = -1;
 let favorites = JSON.parse(localStorage.getItem('harmony_favorites')) || [];
 
 // Elementos DOM
@@ -210,7 +211,6 @@ let currentSongAlbum;
 let currentAlbumArt;
 let lyricsElement;
 let musicGrid;
-let autoScrollBtn;
 let authModal;
 let loginBtn;
 let registerBtn;
@@ -218,3 +218,4 @@ let searchInput;
 let pageTitle;
 let usernameElement;
 let userActions;
+let scrollIndicator;

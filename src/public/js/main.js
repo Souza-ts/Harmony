@@ -3,6 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar elementos DOM
     initializeDOM();
     
+    // Carregar preferências do localStorage
+    const savedAutoScroll = localStorage.getItem('harmony_autoscroll');
+    if (savedAutoScroll !== null) {
+        autoScrollEnabled = savedAutoScroll === 'true';
+    }
+    
     // Esconder loading
     setTimeout(() => {
         document.getElementById('loading-overlay').classList.add('hidden');
@@ -69,7 +75,6 @@ function initializeDOM() {
     
     // Lyrics
     lyricsElement = document.getElementById('lyrics');
-    autoScrollBtn = document.getElementById('auto-scroll-btn');
     
     // Music grid
     musicGrid = document.getElementById('music-grid');
@@ -104,39 +109,6 @@ window.showNotification = function(message, type = 'success') {
     }, 3000);
 };
 
-// Adicionar CSS para notificações flutuantes
-const notificationStyle = document.createElement('style');
-notificationStyle.textContent = `
-    .floating-notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: var(--gradient-primary);
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        box-shadow: var(--shadow-xl);
-        z-index: 9999;
-        transform: translateX(120%);
-        transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    
-    .floating-notification.show {
-        transform: translateX(0);
-    }
-    
-    .floating-notification .notification-content {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    
-    .floating-notification.error {
-        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-    }
-`;
-document.head.appendChild(notificationStyle);
-
 // Adicionar funcionalidade de teclas de atalho
 document.addEventListener('keydown', (e) => {
     // Evitar atalhos em inputs
@@ -145,32 +117,25 @@ document.addEventListener('keydown', (e) => {
     switch(e.code) {
         case 'Space':
             e.preventDefault();
-            togglePlayPause();
+            if (typeof togglePlayPause === 'function') togglePlayPause();
             break;
         case 'ArrowLeft':
-            if (e.ctrlKey) playPreviousSong();
+            if (e.ctrlKey && typeof playPreviousSong === 'function') playPreviousSong();
             break;
         case 'ArrowRight':
-            if (e.ctrlKey) playNextSong();
+            if (e.ctrlKey && typeof playNextSong === 'function') playNextSong();
             break;
         case 'KeyM':
             if (e.ctrlKey) {
                 e.preventDefault();
-                audioPlayer.muted = !audioPlayer.muted;
-                showNotification(audioPlayer.muted ? 'Mudo' : 'Som ativado');
+                if (audioPlayer) {
+                    audioPlayer.muted = !audioPlayer.muted;
+                    showNotification(audioPlayer.muted ? 'Mudo' : 'Som ativado');
+                }
             }
             break;
     }
 });
-
-// Configurar service worker para PWA (opcional)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(err => {
-            console.log('ServiceWorker registration failed: ', err);
-        });
-    });
-}
 
 // Configurar instalação PWA
 let deferredPrompt;

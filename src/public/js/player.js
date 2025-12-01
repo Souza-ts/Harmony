@@ -42,9 +42,6 @@ function initializePlayer() {
         updateProgress();
     });
     
-    // Auto-scroll
-    autoScrollBtn.addEventListener('click', toggleAutoScroll);
-    
     // Carregar primeira música
     loadSong(currentSongIndex);
     renderMusicGrid();
@@ -73,6 +70,9 @@ function loadSong(index) {
     // Carregar letras
     loadLyrics(song.lyrics);
     
+    // Criar indicador de scroll
+    createScrollIndicator();
+    
     // Atualizar grid
     updateActiveCard();
     
@@ -81,18 +81,54 @@ function loadSong(index) {
 }
 
 function loadLyrics(lyrics) {
-    lyricsElement.innerHTML = '';
+    const container = document.getElementById('lyrics');
+    if (!container) return;
     
-    lyrics.forEach((line, index) => {
-        if (line.text.trim() === '') return;
-        
+    container.innerHTML = '';
+    
+    if (!lyrics || lyrics.length === 0) {
+        container.innerHTML = `
+            <div class="lyrics-placeholder">
+                <i class="fas fa-music"></i>
+                <p>Nenhuma letra disponível para esta música</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Filtrar linhas vazias
+    const filteredLyrics = lyrics.filter(line => line.text && line.text.trim() !== '');
+    
+    if (filteredLyrics.length === 0) {
+        container.innerHTML = `
+            <div class="lyrics-placeholder">
+                <i class="fas fa-music"></i>
+                <p>Nenhuma letra disponível para esta música</p>
+            </div>
+        `;
+        return;
+    }
+    
+    filteredLyrics.forEach((line, index) => {
         const lineElement = document.createElement('div');
         lineElement.className = 'lyrics-line';
         lineElement.textContent = line.text;
         lineElement.dataset.time = line.time;
         lineElement.dataset.index = index;
-        lyricsElement.appendChild(lineElement);
+        
+        // Click para ir para o tempo da música
+        lineElement.addEventListener('click', () => {
+            if (audioPlayer) {
+                audioPlayer.currentTime = line.time;
+                audioPlayer.play();
+            }
+        });
+        
+        container.appendChild(lineElement);
     });
+    
+    // Resetar última linha ativa
+    lastActiveLineIndex = -1;
 }
 
 function updateProgress() {
@@ -121,7 +157,6 @@ function updateActiveLyric(currentTime) {
     const lines = document.querySelectorAll('.lyrics-line');
     const container = document.querySelector('.lyrics-container');
     let activeIndex = -1;
-    let lastActiveLineIndex = -1;
     let foundActive = false;
     
     // Encontrar linha ativa baseada no tempo
@@ -160,18 +195,73 @@ function updateActiveLyric(currentTime) {
 
 function smoothScrollToLyric(lineElement, index) {
     const container = document.querySelector('.lyrics-container');
+    if (!container || !lineElement) return;
+    
     const containerHeight = container.clientHeight;
     const lineTop = lineElement.offsetTop;
     const lineHeight = lineElement.offsetHeight;
+    const containerScroll = container.scrollTop;
     
-    // Calcular posição ideal (linha no meio)
-    const targetScroll = lineTop - (containerHeight / 2) + (lineHeight / 2);
+    // Verificar se a linha está visível
+    const lineBottom = lineTop + lineHeight;
+    const viewportTop = containerScroll;
+    const viewportBottom = containerScroll + containerHeight;
     
-    // Scroll suave
-    container.scrollTo({
-        top: targetScroll,
-        behavior: 'smooth'
-    });
+    // Se a linha não está visível ou está muito no topo/baixo
+    if (lineTop < viewportTop || lineBottom > viewportBottom - lineHeight * 2) {
+        // Calcular posição ideal (linha no meio da viewport)
+        const targetScroll = lineTop - (containerHeight / 2) + (lineHeight / 2);
+        
+        // Limitar scroll
+        const maxScroll = container.scrollHeight - containerHeight;
+        const finalScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+        
+        // Scroll suave com easing
+        container.scrollTo({
+            top: finalScroll,
+            behavior: 'smooth'
+        });
+    }
+}
+
+function createScrollIndicator() {
+    const lyricsSection = document.querySelector('.lyrics-section');
+    if (!lyricsSection) return;
+    
+    // Remover indicador existente
+    const existingIndicator = lyricsSection.querySelector('.scroll-indicator');
+    if (existingIndicator) existingIndicator.remove();
+    
+    scrollIndicator = document.createElement('div');
+    scrollIndicator.className = `scroll-indicator ${autoScrollEnabled ? 'active' : ''}`;
+    scrollIndicator.innerHTML = `
+        <i class="fas fa-${autoScrollEnabled ? 'arrow-up' : 'arrow-down'}"></i>
+        <span>${autoScrollEnabled ? 'Auto ON' : 'Auto OFF'}</span>
+    `;
+    
+    scrollIndicator.addEventListener('click', toggleAutoScroll);
+    lyricsSection.appendChild(scrollIndicator);
+}
+
+function toggleAutoScroll() {
+    autoScrollEnabled = !autoScrollEnabled;
+    
+    if (scrollIndicator) {
+        scrollIndicator.classList.toggle('active', autoScrollEnabled);
+        scrollIndicator.innerHTML = `
+            <i class="fas fa-${autoScrollEnabled ? 'arrow-up' : 'arrow-down'}"></i>
+            <span>${autoScrollEnabled ? 'Auto ON' : 'Auto OFF'}</span>
+        `;
+    }
+    
+    showNotification(
+        autoScrollEnabled ? 
+        'Auto-scroll ativado: as letras seguirão a música automaticamente' :
+        'Auto-scroll desativado: use o scroll manual para navegar pelas letras'
+    );
+    
+    // Salvar preferência
+    localStorage.setItem('harmony_autoscroll', autoScrollEnabled);
 }
 
 function togglePlayPause() {
@@ -224,16 +314,6 @@ function handleSongEnd() {
     } else {
         playNextSong();
     }
-}
-
-function toggleAutoScroll() {
-    autoScrollEnabled = !autoScrollEnabled;
-    autoScrollBtn.classList.toggle('active', autoScrollEnabled);
-    autoScrollBtn.innerHTML = autoScrollEnabled ? 
-        '<i class="fas fa-arrow-up"></i><span>Auto ON</span>' :
-        '<i class="fas fa-arrow-down"></i><span>Auto OFF</span>';
-    
-    showNotification(autoScrollEnabled ? 'Auto-scroll ativado' : 'Auto-scroll desativado');
 }
 
 function updatePlayPauseIcon() {
@@ -408,3 +488,22 @@ function renderFavorites() {
         favoritesGrid.appendChild(card);
     });
 }
+
+// Função de teste para debug
+function testAutoScroll() {
+    console.log('=== TESTE AUTO-SCROLL ===');
+    console.log('Auto-scroll habilitado:', autoScrollEnabled);
+    console.log('Total de linhas de letra:', document.querySelectorAll('.lyrics-line').length);
+    console.log('Última linha ativa:', lastActiveLineIndex);
+    
+    // Testar scroll manual
+    const container = document.querySelector('.lyrics-container');
+    if (container) {
+        console.log('Container height:', container.clientHeight);
+        console.log('Scroll height:', container.scrollHeight);
+        console.log('Scroll top:', container.scrollTop);
+    }
+}
+
+// Expor para debugging no console
+window.testAutoScroll = testAutoScroll;

@@ -245,7 +245,7 @@ function handleSearch(e) {
 
 function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
+    notification.className = `floating-notification ${type}`;
     notification.innerHTML = `
         <div class="notification-content">
             <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>
