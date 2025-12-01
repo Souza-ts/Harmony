@@ -119,27 +119,42 @@ function updateDuration() {
 
 function updateActiveLyric(currentTime) {
     const lines = document.querySelectorAll('.lyrics-line');
+    const container = document.querySelector('.lyrics-container');
     let activeIndex = -1;
+    let lastActiveLineIndex = -1;
+    let foundActive = false;
     
-    // Encontrar linha ativa
+    // Encontrar linha ativa baseada no tempo
     lines.forEach((line, index) => {
         const lineTime = parseInt(line.dataset.time);
         line.classList.remove('active');
         
-        if (lineTime <= currentTime) {
+        // Ativar a linha se o tempo atual for >= ao tempo da linha
+        if (lineTime <= currentTime && !foundActive) {
             activeIndex = index;
+            line.classList.add('active');
+            
+            // Se esta é a primeira linha ou houve mudança de linha
+            if (index !== lastActiveLineIndex) {
+                lastActiveLineIndex = index;
+                foundActive = true;
+                
+                // Auto-scroll se estiver habilitado
+                if (autoScrollEnabled && container) {
+                    smoothScrollToLyric(line, index);
+                }
+            }
         }
     });
     
-    // Ativar linha
-    if (activeIndex >= 0) {
-        const activeLine = lines[activeIndex];
-        activeLine.classList.add('active');
-        
-        // Auto-scroll
-        if (autoScrollEnabled) {
-            smoothScrollToLyric(activeLine, activeIndex);
-        }
+    // Se não encontrou linha ativa, tentar a primeira
+    if (activeIndex === -1 && lines.length > 0) {
+        lines[0].classList.add('active');
+    }
+    
+    // Atualizar última linha ativa
+    if (activeIndex !== -1) {
+        lastActiveLineIndex = activeIndex;
     }
 }
 
