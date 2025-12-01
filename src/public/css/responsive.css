@@ -1,0 +1,86 @@
+/* Responsividade */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+    }
+
+    nav ul {
+        margin: 15px 0;
+    }
+
+    nav ul li {
+        margin: 0 10px;
+    }
+
+    .now-playing {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .album-art {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .controls {
+        flex-wrap: wrap;
+    }
+
+    .control-btn {
+        margin: 5px;
+    }
+
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .music-list {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .team-members {
+        flex-direction: column;
+    }
+
+    .team-member {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .btn {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+
+    .player-container {
+        padding: 20px;
+    }
+
+    .album-art {
+        width: 120px;
+        height: 120px;
+        font-size: 3rem;
+    }
+
+    .control-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        margin: 0 8px;
+    }
+
+    .control-btn.play-pause {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+
+    .music-list {
+        grid-template-columns: 1fr;
+    }
+}
