@@ -1,12 +1,14 @@
+// Dados das músicas com letras sincronizadas
 const musicLibrary = [
     {
         id: 1,
         title: "deja vu",
         artist: "Olivia Rodrigo",
         album: "SOUR",
-        duration: 351, // 3:51 minutos
+        duration: 217,
         file: "src/assets/song/DejaVu.mp3",
         cover: "src/assets/cover/Sour.jpg",
+        favorite: false,
         lyrics: [
             { time: 10, text: "Car rides to Malibu" },
             { time: 15, text: "Strawberry ice cream, one spoon for two" },
@@ -57,9 +59,10 @@ const musicLibrary = [
         title: "Happier Than Ever",
         artist: "Billie Eilish",
         album: "Happier Than Ever",
-        duration: 458, // 4:58 minutos
+        duration: 299,
         file: "src/assets/song/Happier Than Ever.mp3",
         cover: "src/assets/cover/Happier Than Ever.jpg",
+        favorite: false,
         lyrics: [
             { time: 0, text: "" },
             { time: 5, text: "When I'm away from you" },
@@ -118,9 +121,10 @@ const musicLibrary = [
         title: "yes, and?",
         artist: "Ariana Grande",
         album: "Eternal Sunshine",
-        duration: 335, // 3:35 minutos
+        duration: 268,
         file: "src/assets/song/yes and.mp3",
         cover: "src/assets/cover/Eternal Sunshine.jpg",
+        favorite: false,
         lyrics: [
             { time: 0, text: "" },
             { time: 48, text: "In case you haven't noticed" },
@@ -180,26 +184,16 @@ const musicLibrary = [
 let currentUser = null;
 let currentSongIndex = 0;
 let isPlaying = false;
-let currentTime = 0;
-let timerInterval = null;
 let isShuffle = false;
 let isRepeat = false;
+let autoScrollEnabled = true;
+let currentTime = 0;
+let favorites = JSON.parse(localStorage.getItem('harmony_favorites')) || [];
 
-// Elementos DOM (serão inicializados em main.js)
+// Elementos DOM
 let audioPlayer;
 let pages;
 let navLinks;
-let loginBtn;
-let registerBtn;
-let logoutBtn;
-let loggedOutDiv;
-let loggedInDiv;
-let userNameElement;
-let userAvatarElement;
-let loginForm;
-let registerForm;
-let registerLink;
-let loginLink;
 let playPauseBtn;
 let playPauseIcon;
 let prevBtn;
@@ -214,6 +208,13 @@ let currentSongTitle;
 let currentSongArtist;
 let currentSongAlbum;
 let currentAlbumArt;
-let albumFallbackIcon;
 let lyricsElement;
-let musicListElement;
+let musicGrid;
+let autoScrollBtn;
+let authModal;
+let loginBtn;
+let registerBtn;
+let searchInput;
+let pageTitle;
+let usernameElement;
+let userActions;

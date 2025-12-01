@@ -1,258 +1,395 @@
-// Funções do player de música
+// Sistema do player de música
 function initializePlayer() {
     audioPlayer = new Audio();
     
+    // Configurar eventos do player
+    audioPlayer.addEventListener('timeupdate', updateProgress);
+    audioPlayer.addEventListener('loadedmetadata', updateDuration);
+    audioPlayer.addEventListener('ended', handleSongEnd);
+    audioPlayer.addEventListener('play', () => {
+        isPlaying = true;
+        updatePlayPauseIcon();
+        startVinylAnimation();
+    });
+    audioPlayer.addEventListener('pause', () => {
+        isPlaying = false;
+        updatePlayPauseIcon();
+        stopVinylAnimation();
+    });
+    
     // Event listeners dos controles
     playPauseBtn.addEventListener('click', togglePlayPause);
+    prevBtn.addEventListener('click', playPreviousSong);
     nextBtn.addEventListener('click', playNextSong);
-    prevBtn.addEventListener('click', playPrevSong);
     
     shuffleBtn.addEventListener('click', () => {
         isShuffle = !isShuffle;
-        shuffleBtn.style.color = isShuffle ? 'var(--primary-color)' : 'white';
+        shuffleBtn.classList.toggle('active', isShuffle);
+        showNotification(isShuffle ? 'Embaralhar ativado' : 'Embaralhar desativado');
     });
     
     repeatBtn.addEventListener('click', () => {
         isRepeat = !isRepeat;
-        repeatBtn.style.color = isRepeat ? 'var(--primary-color)' : 'white';
+        repeatBtn.classList.toggle('active', isRepeat);
+        showNotification(isRepeat ? 'Repetir ativado' : 'Repetir desativado');
     });
     
     // Barra de progresso
     progressBar.addEventListener('click', (e) => {
         const rect = progressBar.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const width = rect.width;
-        const percentage = clickX / width;
-        
-        const song = musicLibrary[currentSongIndex];
-        const newTime = Math.floor(percentage * song.duration);
-        
-        audioPlayer.currentTime = newTime;
-        currentTime = newTime;
+        const percent = (e.clientX - rect.left) / rect.width;
+        audioPlayer.currentTime = percent * audioPlayer.duration;
         updateProgress();
-        updateActiveLyric(currentTime);
     });
     
-    // Eventos do player de áudio
-    audioPlayer.addEventListener('timeupdate', () => {
-        currentTime = Math.floor(audioPlayer.currentTime);
-        updateProgress();
-        updateActiveLyric(currentTime);
-    });
+    // Auto-scroll
+    autoScrollBtn.addEventListener('click', toggleAutoScroll);
     
-    audioPlayer.addEventListener('ended', () => {
-        if (isRepeat) {
-            audioPlayer.currentTime = 0;
-            audioPlayer.play();
-        } else {
-            playNextSong();
-        }
-    });
-    
-    // Inicializar
+    // Carregar primeira música
     loadSong(currentSongIndex);
-    renderMusicList();
+    renderMusicGrid();
 }
 
-// Carregar música
 function loadSong(index) {
-    const song = musicLibrary[index];
+    if (index < 0 || index >= musicLibrary.length) return;
+    
     currentSongIndex = index;
+    const song = musicLibrary[index];
     
     // Atualizar informações da música
     currentSongTitle.textContent = song.title;
     currentSongArtist.textContent = song.artist;
     currentSongAlbum.textContent = song.album;
     
-    // Carregar capa da música
-    loadAlbumArt(song.cover);
+    // Atualizar capa do álbum
+    currentAlbumArt.src = song.cover;
+    currentAlbumArt.onerror = () => {
+        currentAlbumArt.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%238B5CF6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="24">♪</text></svg>';
+    };
     
-    // Configurar o player de áudio
+    // Carregar áudio
     audioPlayer.src = song.file;
-    audioPlayer.load();
-    
-    // Atualizar duração
-    audioPlayer.addEventListener('loadedmetadata', () => {
-        const duration = Math.floor(audioPlayer.duration);
-        const minutes = Math.floor(duration / 60);
-        const seconds = duration % 60;
-        songDurationElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    });
     
     // Carregar letras
     loadLyrics(song.lyrics);
     
-    // Atualizar lista de músicas
-    updateActiveSongInList();
+    // Atualizar grid
+    updateActiveCard();
     
-    // Resetar progresso
-    currentTime = 0;
-    progress.style.width = '0%';
-    currentTimeElement.textContent = '00:00';
-    
-    // Se estava tocando, continuar tocando
-    if (isPlaying) {
-        playSong();
-    }
+    // Atualizar favorito
+    updateFavoriteButton();
 }
 
-// Carregar capa do álbum
-function loadAlbumArt(coverUrl) {
-    currentAlbumArt.src = coverUrl;
-    currentAlbumArt.onload = () => {
-        currentAlbumArt.style.display = 'block';
-        albumFallbackIcon.style.display = 'none';
-    };
-    currentAlbumArt.onerror = () => {
-        currentAlbumArt.style.display = 'none';
-        albumFallbackIcon.style.display = 'block';
-    };
-}
-
-// Carregar letras
 function loadLyrics(lyrics) {
     lyricsElement.innerHTML = '';
     
-    lyrics.forEach(line => {
+    lyrics.forEach((line, index) => {
+        if (line.text.trim() === '') return;
+        
         const lineElement = document.createElement('div');
-        lineElement.className = 'line';
+        lineElement.className = 'lyrics-line';
         lineElement.textContent = line.text;
         lineElement.dataset.time = line.time;
+        lineElement.dataset.index = index;
         lyricsElement.appendChild(lineElement);
     });
 }
 
-// Atualizar letra ativa
-function updateActiveLyric(time) {
-    const lines = document.querySelectorAll('.lyrics .line');
-    let activeLineIndex = -1;
+function updateProgress() {
+    if (!audioPlayer.duration) return;
     
+    const current = audioPlayer.currentTime;
+    const duration = audioPlayer.duration;
+    const percent = (current / duration) * 100;
+    
+    // Atualizar barra de progresso
+    progress.style.width = `${percent}%`;
+    
+    // Atualizar tempo
+    currentTimeElement.textContent = formatTime(current);
+    songDurationElement.textContent = formatTime(duration);
+    
+    // Atualizar letras sincronizadas
+    updateActiveLyric(current);
+}
+
+function updateDuration() {
+    songDurationElement.textContent = formatTime(audioPlayer.duration);
+}
+
+function updateActiveLyric(currentTime) {
+    const lines = document.querySelectorAll('.lyrics-line');
+    let activeIndex = -1;
+    
+    // Encontrar linha ativa
     lines.forEach((line, index) => {
+        const lineTime = parseInt(line.dataset.time);
         line.classList.remove('active');
         
-        const lineTime = parseInt(line.dataset.time);
-        if (lineTime <= time) {
-            activeLineIndex = index;
+        if (lineTime <= currentTime) {
+            activeIndex = index;
         }
     });
     
-    if (activeLineIndex >= 0) {
-        lines[activeLineIndex].classList.add('active');
+    // Ativar linha
+    if (activeIndex >= 0) {
+        const activeLine = lines[activeIndex];
+        activeLine.classList.add('active');
         
-        // Scroll para a linha ativa
-        if (activeLineIndex > 2) {
-            const lyricsContainer = document.querySelector('.lyrics-container');
-            const lineElement = lines[activeLineIndex];
-            const lineTop = lineElement.offsetTop;
-            lyricsContainer.scrollTop = lineTop - 100;
+        // Auto-scroll
+        if (autoScrollEnabled) {
+            smoothScrollToLyric(activeLine, activeIndex);
         }
     }
 }
 
-// Renderizar lista de músicas
-function renderMusicList() {
-    musicListElement.innerHTML = '';
+function smoothScrollToLyric(lineElement, index) {
+    const container = document.querySelector('.lyrics-container');
+    const containerHeight = container.clientHeight;
+    const lineTop = lineElement.offsetTop;
+    const lineHeight = lineElement.offsetHeight;
     
-    musicLibrary.forEach((song, index) => {
-        const card = document.createElement('div');
-        card.className = 'music-card';
-        if (index === currentSongIndex) {
-            card.classList.add('active');
-        }
-        
-        card.innerHTML = `
-            <div class="album-art-small">
-                <img src="${song.cover}" alt="Capa" class="album-art-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                <i class="fas fa-music album-fallback-icon" style="display: none;"></i>
-            </div>
-            <h3>${song.title}</h3>
-            <p>${song.artist} - ${song.album}</p>
-            <p>${Math.floor(song.duration / 60)}:${(song.duration % 60).toString().padStart(2, '0')}</p>
-        `;
-        
-        card.addEventListener('click', () => {
-            currentSongIndex = index;
-            loadSong(currentSongIndex);
-            if (isPlaying) {
-                playSong();
-            }
-        });
-        
-        musicListElement.appendChild(card);
+    // Calcular posição ideal (linha no meio)
+    const targetScroll = lineTop - (containerHeight / 2) + (lineHeight / 2);
+    
+    // Scroll suave
+    container.scrollTo({
+        top: targetScroll,
+        behavior: 'smooth'
     });
-}
-
-// Atualizar música ativa na lista
-function updateActiveSongInList() {
-    const cards = document.querySelectorAll('.music-card');
-    cards.forEach((card, index) => {
-        if (index === currentSongIndex) {
-            card.classList.add('active');
-        } else {
-            card.classList.remove('active');
-        }
-    });
-}
-
-// Funções de controle do player
-function playSong() {
-    isPlaying = true;
-    playPauseIcon.classList.remove('fa-play');
-    playPauseIcon.classList.add('fa-pause');
-    audioPlayer.play();
-}
-
-function pauseSong() {
-    isPlaying = false;
-    playPauseIcon.classList.remove('fa-pause');
-    playPauseIcon.classList.add('fa-play');
-    audioPlayer.pause();
 }
 
 function togglePlayPause() {
-    if (isPlaying) {
-        pauseSong();
+    if (audioPlayer.paused) {
+        audioPlayer.play();
     } else {
-        playSong();
+        audioPlayer.pause();
     }
 }
 
 function playNextSong() {
+    let nextIndex;
+    
     if (isShuffle) {
-        currentSongIndex = Math.floor(Math.random() * musicLibrary.length);
+        do {
+            nextIndex = Math.floor(Math.random() * musicLibrary.length);
+        } while (nextIndex === currentSongIndex && musicLibrary.length > 1);
     } else {
-        currentSongIndex = (currentSongIndex + 1) % musicLibrary.length;
+        nextIndex = (currentSongIndex + 1) % musicLibrary.length;
     }
     
-    loadSong(currentSongIndex);
+    loadSong(nextIndex);
+    if (isPlaying) audioPlayer.play();
 }
 
-function playPrevSong() {
+function playPreviousSong() {
     if (audioPlayer.currentTime > 3) {
-        // Se já passou 3 segundos, volta ao início da música atual
         audioPlayer.currentTime = 0;
-        currentTime = 0;
-        updateProgress();
+        return;
+    }
+    
+    let prevIndex;
+    
+    if (isShuffle) {
+        do {
+            prevIndex = Math.floor(Math.random() * musicLibrary.length);
+        } while (prevIndex === currentSongIndex && musicLibrary.length > 1);
     } else {
-        // Senão, vai para a música anterior
-        if (isShuffle) {
-            currentSongIndex = Math.floor(Math.random() * musicLibrary.length);
-        } else {
-            currentSongIndex = (currentSongIndex - 1 + musicLibrary.length) % musicLibrary.length;
-        }
-        
-        loadSong(currentSongIndex);
+        prevIndex = (currentSongIndex - 1 + musicLibrary.length) % musicLibrary.length;
+    }
+    
+    loadSong(prevIndex);
+    if (isPlaying) audioPlayer.play();
+}
+
+function handleSongEnd() {
+    if (isRepeat) {
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
+    } else {
+        playNextSong();
     }
 }
 
-// Atualizar barra de progresso
-function updateProgress() {
-    const song = musicLibrary[currentSongIndex];
-    const progressPercent = (currentTime / song.duration) * 100;
-    progress.style.width = `${progressPercent}%`;
+function toggleAutoScroll() {
+    autoScrollEnabled = !autoScrollEnabled;
+    autoScrollBtn.classList.toggle('active', autoScrollEnabled);
+    autoScrollBtn.innerHTML = autoScrollEnabled ? 
+        '<i class="fas fa-arrow-up"></i><span>Auto ON</span>' :
+        '<i class="fas fa-arrow-down"></i><span>Auto OFF</span>';
     
-    // Atualizar tempo atual
-    const minutes = Math.floor(currentTime / 60);
-    const seconds = currentTime % 60;
-    currentTimeElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    showNotification(autoScrollEnabled ? 'Auto-scroll ativado' : 'Auto-scroll desativado');
+}
+
+function updatePlayPauseIcon() {
+    playPauseIcon.className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
+}
+
+function startVinylAnimation() {
+    document.querySelector('.album-art-large').classList.add('playing');
+}
+
+function stopVinylAnimation() {
+    document.querySelector('.album-art-large').classList.remove('playing');
+}
+
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function renderMusicGrid() {
+    musicGrid.innerHTML = '';
+    
+    musicLibrary.forEach((song, index) => {
+        const card = document.createElement('div');
+        card.className = `music-card ${index === currentSongIndex ? 'active' : ''}`;
+        card.dataset.index = index;
+        
+        card.innerHTML = `
+            <button class="card-favorite ${song.favorite ? 'active' : ''}" data-id="${song.id}">
+                <i class="fas fa-heart"></i>
+            </button>
+            <div class="card-cover">
+                <img src="${song.cover}" alt="${song.album}">
+                <button class="card-play-btn">
+                    <i class="fas fa-play"></i>
+                </button>
+            </div>
+            <div class="card-content">
+                <h4>${song.title}</h4>
+                <p>${song.artist}</p>
+                <div class="card-duration">
+                    <i class="fas fa-clock"></i>
+                    <span>${formatTime(song.duration)}</span>
+                </div>
+            </div>
+        `;
+        
+        // Event listeners
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('.card-favorite') && !e.target.closest('.card-play-btn')) {
+                loadSong(index);
+                if (isPlaying) audioPlayer.play();
+            }
+        });
+        
+        const playBtn = card.querySelector('.card-play-btn');
+        playBtn.addEventListener('click', () => {
+            loadSong(index);
+            audioPlayer.play();
+        });
+        
+        const favoriteBtn = card.querySelector('.card-favorite');
+        favoriteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleFavorite(song.id);
+        });
+        
+        musicGrid.appendChild(card);
+    });
+}
+
+function updateActiveCard() {
+    document.querySelectorAll('.music-card').forEach((card, index) => {
+        card.classList.toggle('active', index === currentSongIndex);
+    });
+}
+
+function updateFavoriteButton() {
+    const song = musicLibrary[currentSongIndex];
+    const favoriteBtn = document.querySelector(`.card-favorite[data-id="${song.id}"]`);
+    if (favoriteBtn) {
+        favoriteBtn.classList.toggle('active', song.favorite);
+    }
+}
+
+function toggleFavorite(songId) {
+    const song = musicLibrary.find(s => s.id === songId);
+    if (!song) return;
+    
+    song.favorite = !song.favorite;
+    
+    // Atualizar localStorage
+    if (song.favorite) {
+        if (!favorites.includes(songId)) {
+            favorites.push(songId);
+        }
+    } else {
+        favorites = favorites.filter(id => id !== songId);
+    }
+    
+    localStorage.setItem('harmony_favorites', JSON.stringify(favorites));
+    
+    // Atualizar UI
+    updateFavoriteButton();
+    showNotification(song.favorite ? 'Adicionado aos favoritos' : 'Removido dos favoritos');
+    
+    // Atualizar página de favoritos se estiver visível
+    if (document.getElementById('favorites-page').classList.contains('active')) {
+        renderFavorites();
+    }
+}
+
+function renderMusicLibrary() {
+    renderMusicGrid();
+}
+
+function renderFavorites() {
+    const favoritesGrid = document.getElementById('favorites-grid');
+    const emptyState = document.getElementById('favorites-empty');
+    
+    const favoriteSongs = musicLibrary.filter(song => song.favorite);
+    
+    if (favoriteSongs.length === 0) {
+        favoritesGrid.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    emptyState.style.display = 'none';
+    favoritesGrid.style.display = 'grid';
+    favoritesGrid.innerHTML = '';
+    
+    favoriteSongs.forEach((song, index) => {
+        const card = document.createElement('div');
+        card.className = 'music-card';
+        
+        card.innerHTML = `
+            <button class="card-favorite active" data-id="${song.id}">
+                <i class="fas fa-heart"></i>
+            </button>
+            <div class="card-cover">
+                <img src="${song.cover}" alt="${song.album}">
+                <button class="card-play-btn">
+                    <i class="fas fa-play"></i>
+                </button>
+            </div>
+            <div class="card-content">
+                <h4>${song.title}</h4>
+                <p>${song.artist}</p>
+                <div class="card-duration">
+                    <i class="fas fa-clock"></i>
+                    <span>${formatTime(song.duration)}</span>
+                </div>
+            </div>
+        `;
+        
+        // Event listeners
+        card.addEventListener('click', () => {
+            const songIndex = musicLibrary.findIndex(s => s.id === song.id);
+            loadSong(songIndex);
+            if (isPlaying) audioPlayer.play();
+            showPage('home');
+        });
+        
+        const favoriteBtn = card.querySelector('.card-favorite');
+        favoriteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleFavorite(song.id);
+        });
+        
+        favoritesGrid.appendChild(card);
+    });
 }

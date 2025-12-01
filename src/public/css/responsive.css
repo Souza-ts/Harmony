@@ -1,86 +1,405 @@
-/* Responsividade */
-@media (max-width: 768px) {
-    .header-container {
-        flex-direction: column;
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 1400px) {
+    .sidebar {
+        width: 240px;
     }
-
-    nav ul {
-        margin: 15px 0;
-    }
-
-    nav ul li {
-        margin: 0 10px;
-    }
-
-    .now-playing {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .album-art {
-        margin-right: 0;
-        margin-bottom: 20px;
-    }
-
-    .controls {
-        flex-wrap: wrap;
-    }
-
-    .control-btn {
-        margin: 5px;
-    }
-
-    .page-title {
-        font-size: 2rem;
-    }
-
-    .music-list {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    }
-
-    .team-members {
-        flex-direction: column;
-    }
-
-    .team-member {
-        min-width: 100%;
+    
+    .main-content {
+        padding: 1.5rem;
     }
 }
 
-@media (max-width: 480px) {
-    .logo {
+@media (max-width: 1200px) {
+    .player-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .now-playing {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .song-details {
+        width: 100%;
+        max-width: 500px;
+    }
+    
+    .album-art-large {
+        width: 220px;
+        height: 220px;
+    }
+    
+    .music-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+}
+
+@media (max-width: 992px) {
+    .sidebar {
+        width: 200px;
+        padding: 1.5rem 1rem;
+    }
+    
+    .logo h1 {
         font-size: 1.5rem;
     }
-
-    .btn {
-        padding: 8px 15px;
-        font-size: 0.9rem;
+    
+    .nav-link span {
+        font-size: 0.875rem;
     }
-
-    .player-container {
-        padding: 20px;
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
     }
+    
+    .about-content {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    
+    .stats-section {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 
-    .album-art {
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        padding: 1rem;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .sidebar-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .logo {
+        justify-content: center;
+    }
+    
+    .sidebar-nav ul {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .nav-link {
+        padding: 0.5rem 1rem;
+    }
+    
+    .nav-link span {
+        display: block;
+    }
+    
+    .sidebar-playlist {
+        display: none;
+    }
+    
+    .main-content {
+        padding: 1.5rem;
+    }
+    
+    .main-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .header-right {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .search-bar {
+        width: 100%;
+    }
+    
+    .hero-section {
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .album-art-large {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .controls-main {
+        gap: 0.75rem;
+    }
+    
+    .control-btn {
+        width: 42px;
+        height: 42px;
+    }
+    
+    .control-btn.play-pause {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .music-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 1rem;
+    }
+    
+    .about-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .about-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .auth-container {
+        margin: 1rem;
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-section {
+        padding: 1.5rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 1.75rem;
+    }
+    
+    .hero-content p {
+        font-size: 1rem;
+    }
+    
+    .player-card,
+    .lyrics-section {
+        padding: 1.5rem;
+    }
+    
+    .album-art-large {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .song-info h3 {
+        font-size: 1.5rem;
+    }
+    
+    .lyrics-container {
+        height: 300px;
+    }
+    
+    .lyrics {
+        font-size: 1rem;
+    }
+    
+    .music-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .about-card {
+        padding: 1.5rem;
+    }
+    
+    .about-hero h1 {
+        font-size: 1.75rem;
+    }
+    
+    .section-header h3 {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .sidebar-nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .nav-link {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .hero-content h1 {
+        font-size: 1.5rem;
+    }
+    
+    .btn-hero {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .album-art-large {
         width: 120px;
         height: 120px;
-        font-size: 3rem;
     }
-
-    .control-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-        margin: 0 8px;
+    
+    .vinyl-ring {
+        width: 100px;
+        height: 100px;
     }
-
-    .control-btn.play-pause {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
+    
+    .controls-main {
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
+    
+    .lyrics-controls {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .lyrics-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
 
-    .music-list {
+/* ===== DARK MODE SUPPORT ===== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --light: #F9FAFB;
+        --dark: #111827;
+        --darker: #0F172A;
+        --gray: #6B7280;
+        --gray-light: #374151;
+    }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    .sidebar,
+    .main-header,
+    .player-controls,
+    .lyrics-controls,
+    .view-controls,
+    .card-play-btn,
+    .card-favorite {
+        display: none;
+    }
+    
+    .app-container {
+        flex-direction: column;
+    }
+    
+    .main-content {
+        padding: 0;
+    }
+    
+    .lyrics-container {
+        height: auto;
+        overflow: visible;
+    }
+    
+    .music-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .music-card {
+        break-inside: avoid;
+        border: 1px solid #ddd;
+    }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .logo-animation,
+    .vinyl-ring.playing,
+    .lyrics-line.active {
+        animation: none;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    :root {
+        --primary: #0056CC;
+        --secondary: #008000;
+        --dark: #000000;
+        --light: #FFFFFF;
+    }
+    
+    .nav-link.active {
+        border: 2px solid var(--primary);
+    }
+    
+    .control-btn {
+        border: 1px solid currentColor;
+    }
+}
+
+/* Orientation Specific */
+@media (orientation: landscape) and (max-height: 600px) {
+    .sidebar {
+        padding: 1rem;
+    }
+    
+    .sidebar-nav ul {
+        flex-wrap: wrap;
+    }
+    
+    .lyrics-container {
+        height: 250px;
+    }
+    
+    .player-section {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .control-btn,
+    .lyrics-btn,
+    .view-btn,
+    .music-card,
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .progress-bar {
+        height: 12px;
+    }
+    
+    .progress::after {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .nav-link {
+        padding: 1rem;
+    }
+    
+    .card-play-btn {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
