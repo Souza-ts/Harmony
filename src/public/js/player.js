@@ -156,40 +156,35 @@ function updateDuration() {
 function updateActiveLyric(currentTime) {
     const lines = document.querySelectorAll('.lyrics-line');
     const container = document.querySelector('.lyrics-container');
-    let activeIndex = -1;
-    let foundActive = false;
     
-    // Encontrar linha ativa baseada no tempo
+    let activeIndex = -1;
+
     lines.forEach((line, index) => {
-        const lineTime = parseInt(line.dataset.time);
+        const lineTime = parseFloat(line.dataset.time); // CORRETO
         
-        // Ativar a linha se o tempo atual for >= ao tempo da linha
-        if (lineTime <= currentTime && !foundActive) {
+        // Pega a última linha cujo tempo já passou
+        if (currentTime >= lineTime) {
             activeIndex = index;
-            line.classList.add('active');
-            
-            // Se esta é a primeira linha ou houve mudança de linha
-            if (index !== lastActiveLineIndex) {
-                lastActiveLineIndex = index;
-                foundActive = true;
-                
-                // Auto-scroll se estiver habilitado
-                if (autoScrollEnabled && container) {
-                    smoothScrollToLyric(line, index);
-                }
-            }
         }
     });
-    
-    // Se não encontrou linha ativa, tentar a primeira
-    if (activeIndex === -1 && lines.length > 0) {
-        lines[0].classList.add('active');
-    }
-    
-    // Atualizar última linha ativa
+
     if (activeIndex !== -1) {
-        lastActiveLineIndex = activeIndex;
+        const activeLine = lines[activeIndex];
+
+        if (activeIndex !== lastActiveLineIndex) {
+            // Atualiza visualmente
+            lines.forEach(l => l.classList.remove('active'));
+            activeLine.classList.add('active');
+
+            // Scroll
+            if (autoScrollEnabled && container) {
+                smoothScrollToLyric(activeLine, activeIndex);
+            }
+
+            lastActiveLineIndex = activeIndex;
+        }
     }
+}
 }
 
 function smoothScrollToLyric(lineElement, index) {
