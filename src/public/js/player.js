@@ -185,8 +185,11 @@ function updateActiveLyric(currentTime) {
         }
     }
 }
+<<<<<<< HEAD
 }
 
+=======
+>>>>>>> 8678338 (kauzx00 helped me fix the letters.)
 function smoothScrollToLyric(lineElement, index) {
     const container = document.querySelector('.lyrics-container');
     if (!container || !lineElement) return;
