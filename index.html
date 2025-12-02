@@ -1,126 +1,162 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harmony</title>
-    <link rel="stylesheet" href="src/public/css/style.css">
+    <title>Weather App - Aplicativo de Clima</title>
+    <link rel="stylesheet" href="src/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/48/000000/partly-cloudy-day--v1.png">
 </head>
 <body>
-    <!-- Cabeçalho/Navegação -->
-    <header class="main-header">
-        <div class="container">
-            <nav class="navbar">
-                <a href="index.html" class="logo">Harmony</a>
-                <ul class="nav-menu">
-                    <li><a href="index.html" class="active">Início</a></li>
-                    <li><a href="src/public/pages/player/library.html">Biblioteca</a></li>
-                    <li><a href="src/public/pages/player/player.html">Player</a></li>
-                    <li><a href="src/public/pages/info/about.html">Sobre Nós</a></li>
-                    <li><a href="src/public/pages/login/login.html" class="btn-login">Entrar</a></li>
-                    <li><a href="src/public/pages/login/signup.html" class="btn-signup">Cadastrar</a></li>
-                </ul>
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </nav>
-        </div>
-    </header>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-cloud-sun"></i> Weather App</h1>
+            <p class="subtitle">Verifique a previsão do tempo em qualquer cidade do mundo</p>
+        </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Ouça suas músicas favoritas com <span class="highlight">letras sincronizadas</span></h1>
-                <p>Harmony oferece uma experiência única de streaming de música com recursos avançados e interface intuitiva.</p>
-                <div class="hero-buttons">
-                    <a href="src/public/pages/login/signup.html" class="btn-primary">Começar Agora</a>
-                    <a href="src/public/pages/info/about.html" class="btn-secondary">Saiba Mais</a>
+        <main>
+            <div class="search-container">
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="city-input" 
+                        placeholder="Digite o nome da cidade (ex: São Paulo, Londres, Tóquio)" 
+                        autocomplete="off"
+                    >
+                    <button id="search-btn">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+                <div class="suggestions">
+                    <p class="suggestion-title">Cidades sugeridas:</p>
+                    <div class="city-buttons">
+                        <button class="city-btn" data-city="São Paulo">São Paulo</button>
+                        <button class="city-btn" data-city="Rio de Janeiro">Rio de Janeiro</button>
+                        <button class="city-btn" data-city="Brasília">Brasília</button>
+                        <button class="city-btn" data-city="Nova York">Nova York</button>
+                        <button class="city-btn" data-city="Londres">Londres</button>
+                        <button class="city-btn" data-city="Tóquio">Tóquio</button>
+                    </div>
                 </div>
             </div>
-            <div class="hero-image">
-                <img src="images/music-hero.svg" alt="Ilustração de streaming de música">
-            </div>
-        </div>
-    </section>
 
-    <!-- Recursos -->
-    <section class="features">
-        <div class="container">
-            <h2 class="section-title">Recursos do Harmony</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-music"></i>
-                    </div>
-                    <h3>Player Avançado</h3>
-                    <p>Controle total sobre a reprodução com visualização de letras sincronizadas em tempo real.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-sync-alt"></i>
-                    </div>
-                    <h3>Sincronização de Letras</h3>
-                    <p>Visualize as letras das músicas sincronizadas com a reprodução para uma experiência imersiva.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-user-shield"></i>
-                    </div>
-                    <h3>Conta Personalizada</h3>
-                    <p>Sistema de login seguro com configurações personalizáveis para cada usuário.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-headphones"></i>
-                    </div>
-                    <h3>Biblioteca Organizada</h3>
-                    <p>Organize suas músicas em playlists e categorias para fácil acesso.</p>
-                </div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Buscando dados meteorológicos...</p>
             </div>
-        </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="main-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>Harmony</h3>
-                    <p>Uma plataforma de streaming musical desenvolvida como projeto para o curso de Programador Web.</p>
+            <div class="weather-container" id="weather-container">
+                <!-- Informações atuais do clima -->
+                <div class="current-weather">
+                    <div class="location">
+                        <h2 id="city-name">São Paulo, BR</h2>
+                        <p id="current-date">Segunda-feira, 15 de Maio de 2023</p>
+                    </div>
+                    
+                    <div class="weather-main">
+                        <div class="temp-container">
+                            <div class="current-temp">
+                                <span id="temperature">24</span>
+                                <span class="temp-unit">°C</span>
+                            </div>
+                            <div class="weather-description">
+                                <div class="weather-icon" id="weather-icon">
+                                    <i class="fas fa-sun"></i>
+                                </div>
+                                <p id="weather-desc">Parcialmente Nublado</p>
+                            </div>
+                        </div>
+                        
+                        <div class="weather-details">
+                            <div class="detail-item">
+                                <i class="fas fa-temperature-high"></i>
+                                <div>
+                                    <p class="detail-label">Sensação Térmica</p>
+                                    <p class="detail-value" id="feels-like">25°C</p>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-tint"></i>
+                                <div>
+                                    <p class="detail-label">Umidade</p>
+                                    <p class="detail-value" id="humidity">65%</p>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-wind"></i>
+                                <div>
+                                    <p class="detail-label">Vento</p>
+                                    <p class="detail-value" id="wind-speed">12 km/h</p>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-compress-alt"></i>
+                                <div>
+                                    <p class="detail-label">Pressão</p>
+                                    <p class="detail-value" id="pressure">1013 hPa</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="footer-section">
-                    <h4>Links Rápidos</h4>
-                    <ul>
-                        <li><a href="index.html">Início</a></li>
-                        <li><a href="src/public/pages/player/library.html">Biblioteca</a></li>
-                        <li><a href="src/public/pages/player/player.html">Player</a></li>
-                        <li><a href="src/public/pages/info/about.html">Sobre Nós</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Conta</h4>
-                    <ul>
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="src/public/pages/login/signup.html">Cadastrar</a></li>
-                        <li><a href="src/public/pages/login/account.html">Configurações</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Desenvolvedor</h4>
-                    <p>Projeto desenvolvido por um único programador para o curso de Programador Web.</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Harmony. Todos os direitos reservados.</p>
-            </div>
-        </div>
-    </footer>
 
-    <script src="src/public/js/helper/utils.js"></script>
+                <!-- Previsão para os próximos dias -->
+                <div class="forecast">
+                    <h3><i class="fas fa-calendar-alt"></i> Previsão para os Próximos Dias</h3>
+                    <div class="forecast-cards" id="forecast-cards">
+                        <!-- Cards serão gerados dinamicamente pelo JavaScript -->
+                        <div class="forecast-card">
+                            <p class="forecast-day">Amanhã</p>
+                            <div class="forecast-icon">
+                                <i class="fas fa-cloud-rain"></i>
+                            </div>
+                            <div class="forecast-temp">
+                                <span class="forecast-high">26°</span>
+                                <span class="forecast-low">18°</span>
+                            </div>
+                        </div>
+                        <!-- Mais 4 cards serão adicionados via JS -->
+                    </div>
+                </div>
+
+                <!-- Informações extras -->
+                <div class="extra-info">
+                    <div class="info-card">
+                        <h4><i class="fas fa-sun"></i> Nascer do Sol</h4>
+                        <p id="sunrise">06:45</p>
+                    </div>
+                    <div class="info-card">
+                        <h4><i class="fas fa-moon"></i> Pôr do Sol</h4>
+                        <p id="sunset">17:30</p>
+                    </div>
+                    <div class="info-card">
+                        <h4><i class="fas fa-eye"></i> Visibilidade</h4>
+                        <p id="visibility">10 km</p>
+                    </div>
+                    <div class="info-card">
+                        <h4><i class="fas fa-cloud"></i> Nebulosidade</h4>
+                        <p id="cloudiness">40%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensagem de erro -->
+            <div class="error-container" id="error-container">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Cidade não encontrada</h3>
+                <p id="error-message">Não foi possível encontrar a cidade digitada. Verifique a ortografia e tente novamente.</p>
+                <button id="try-again-btn">Tentar Novamente</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>Desenvolvido para projeto de curso | Dados fornecidos pela <a href="https://openweathermap.org/" target="_blank">OpenWeatherMap API</a></p>
+            <p class="api-note">⚠️ Para rodar localmente, você precisará de uma chave de API gratuita</p>
+        </footer>
+    </div>
+    
+    <script src="src/js/script.js"></script>
 </body>
 </html>
