@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmony - Criar Conta</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="../../../../index.html" class="logo">Harmony</a>
+                <h2>Crie sua conta Harmony</h2>
+                <p>Junte-se à nossa comunidade musical</p>
+            </div>
+            
+            <form id="signupForm" class="auth-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">Nome</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="firstName" name="firstName" placeholder="Seu nome" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastName">Sobrenome</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="lastName" name="lastName" placeholder="Seu sobrenome" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Nome de usuário</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-at"></i>
+                        <input type="text" id="username" name="username" placeholder="Escolha um nome de usuário" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Crie uma senha segura" required>
+                        <button type="button" class="toggle-password" data-target="password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-bar"></div>
+                        <span class="strength-text">Força da senha: <span id="strengthValue">Fraca</span></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Senha</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirme sua senha" required>
+                        <button type="button" class="toggle-password" data-target="confirmPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-match">
+                        <i class="fas fa-check hidden" id="passwordMatchIcon"></i>
+                        <span id="passwordMatchText"></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="birthDate">Data de Nascimento</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-calendar"></i>
+                        <input type="date" id="birthDate" name="birthDate" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="terms" required>
+                        <span class="checkmark"></span>
+                        Concordo com os <a href="#">Termos de Serviço</a> e <a href="#">Política de Privacidade</a>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="newsletter">
+                        <span class="checkmark"></span>
+                        Desejo receber novidades e atualizações do Harmony por e-mail
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary btn-block">Criar Conta</button>
+                
+                <div class="auth-divider">
+                    <span>ou cadastre-se com</span>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="btn-social google">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                    <button type="button" class="btn-social github">
+                        <i class="fab fa-github"></i> GitHub
+                    </button>
+                </div>
+                
+                <div class="auth-footer">
+                    <p>Já tem uma conta? <a href="../login/login.html">Faça login</a></p>
+                </div>
+            </form>
+            
+            <div class="auth-notice">
+                <p><i class="fas fa-info-circle"></i> Esta é uma versão de demonstração. Os dados são armazenados localmente no seu navegador.</p>
+            </div>
+        </div>
+        
+        <div class="auth-side">
+            <div class="auth-side-content">
+                <h2>Comece sua jornada musical</h2>
+                <p>Crie sua conta Harmony para desbloquear todos os recursos:</p>
+                <ul class="features-list">
+                    <li><i class="fas fa-check-circle"></i> Acesso ao player avançado com letras sincronizadas</li>
+                    <li><i class="fas fa-check-circle"></i> Crie e gerencie suas playlists personalizadas</li>
+                    <li><i class="fas fa-check-circle"></i> Receba recomendações baseadas no seu gosto musical</li>
+                    <li><i class="fas fa-check-circle"></i> Sincronize suas músicas entre dispositivos</li>
+                    <li><i class="fas fa-check-circle"></i> Acesso a conteúdo exclusivo</li>
+                </ul>
+                <a href="../../../../index.html" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar para a página inicial
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/login/auth.js"></script>
+</body>
+</html>

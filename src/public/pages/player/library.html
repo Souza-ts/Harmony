@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmony - Biblioteca</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Cabeçalho/Navegação -->
+    <header class="main-header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="../../../../index.html" class="logo">Harmony</a>
+                <ul class="nav-menu">
+                    <li><a href="../../../../index.html">Início</a></li>
+                    <li><a href="../player/library.html" class="active">Biblioteca</a></li>
+                    <li><a href="../player/player.html">Player</a></li>
+                    <li><a href="../info/about.html">Sobre Nós</a></li>
+                    <li><a href="../login/account.html" class="btn-account"><i class="fas fa-user"></i> Minha Conta</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Biblioteca -->
+    <main class="library-main">
+        <div class="container">
+            <div class="library-header">
+                <h1><i class="fas fa-music"></i> Minha Biblioteca</h1>
+                <div class="library-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar músicas, artistas ou álbuns...">
+                    </div>
+                    <div class="filter-controls">
+                        <button class="btn-filter active" data-filter="all">Todas</button>
+                        <button class="btn-filter" data-filter="favorites">Favoritas</button>
+                        <button class="btn-filter" data-filter="recent">Recentes</button>
+                        <button class="btn-filter" data-filter="playlists">Playlists</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="library-content">
+                <!-- Seção de Playlists -->
+                <section class="library-section" id="playlistsSection">
+                    <h2>Minhas Playlists</h2>
+                    <div class="playlists-grid" id="playlistsGrid">
+                        <!-- Playlists serão carregadas aqui -->
+                    </div>
+                    <button class="btn-create-playlist">
+                        <i class="fas fa-plus"></i> Criar Nova Playlist
+                    </button>
+                </section>
+                
+                <!-- Seção de Músicas -->
+                <section class="library-section" id="songsSection">
+                    <div class="section-header">
+                        <h2>Todas as Músicas</h2>
+                        <div class="sort-controls">
+                            <span>Ordenar por:</span>
+                            <select id="sortSelect">
+                                <option value="title">Título</option>
+                                <option value="artist">Artista</option>
+                                <option value="album">Álbum</option>
+                                <option value="date">Data de Adição</option>
+                                <option value="duration">Duração</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="songs-table-container">
+                        <table class="songs-table" id="songsTable">
+                            <thead>
+                                <tr>
+                                    <th class="col-checkbox">
+                                        <input type="checkbox" id="selectAll">
+                                    </th>
+                                    <th class="col-title">Título</th>
+                                    <th class="col-artist">Artista</th>
+                                    <th class="col-album">Álbum</th>
+                                    <th class="col-duration">Duração</th>
+                                    <th class="col-added">Adicionada</th>
+                                    <th class="col-actions">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="songsTableBody">
+                                <!-- Músicas serão carregadas aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-actions">
+                        <button class="btn-action" id="playSelected">
+                            <i class="fas fa-play"></i> Reproduzir Selecionadas
+                        </button>
+                        <button class="btn-action" id="addToPlaylist">
+                            <i class="fas fa-list-music"></i> Adicionar à Playlist
+                        </button>
+                        <button class="btn-action" id="downloadSelected">
+                            <i class="fas fa-download"></i> Baixar Selecionadas
+                        </button>
+                    </div>
+                </section>
+                
+                <!-- Seção de Estatísticas -->
+                <section class="library-section" id="statsSection">
+                    <h2>Suas Estatísticas</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-music"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Total de Músicas</h3>
+                                <p class="stat-number" id="totalSongs">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Tempo Total</h3>
+                                <p class="stat-number" id="totalTime">0h 0m</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Favoritas</h3>
+                                <p class="stat-number" id="favoriteSongs">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Playlists</h3>
+                                <p class="stat-number" id="totalPlaylists">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para criar playlist -->
+    <div class="modal" id="createPlaylistModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Criar Nova Playlist</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="createPlaylistForm">
+                    <div class="form-group">
+                        <label for="playlistName">Nome da Playlist</label>
+                        <input type="text" id="playlistName" name="playlistName" placeholder="Digite o nome da playlist" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="playlistDescription">Descrição (opcional)</label>
+                        <textarea id="playlistDescription" name="playlistDescription" placeholder="Descreva sua playlist" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="playlistVisibility">Visibilidade</label>
+                        <select id="playlistVisibility" name="playlistVisibility">
+                            <option value="private">Privada (apenas eu)</option>
+                            <option value="public">Pública (todos podem ver)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="addCurrentSongs">
+                            <span class="checkmark"></span>
+                            Adicionar músicas atualmente selecionadas
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelPlaylist">Cancelar</button>
+                <button class="btn-primary" id="savePlaylist">Criar Playlist</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Harmony</h3>
+                    <p>Uma plataforma de streaming musical desenvolvida como projeto para o curso de Programador Web.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links Rápidos</h4>
+                    <ul>
+                        <li><a href="../../../../index.html">Início</a></li>
+                        <li><a href="../player/library.html">Biblioteca</a></li>
+                        <li><a href="../player/player.html">Player</a></li>
+                        <li><a href="../info/about.html">Sobre Nós</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Conta</h4>
+                    <ul>
+                        <li><a href="../login/login.html">Login</a></li>
+                        <li><a href="../login/signup.html">Cadastrar</a></li>
+                        <li><a href="../login/account.html">Configurações</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Desenvolvedor</h4>
+                    <p>Projeto desenvolvido por um único programador para o curso de Programador Web.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Harmony. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../js/player/library.js"></script>
+    <script src="../../js/helper/utils.js"></script>
+</body>
+</html>

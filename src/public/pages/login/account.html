@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmony - Configurações da Conta</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Cabeçalho/Navegação -->
+    <header class="main-header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="../../../../index.html" class="logo">Harmony</a>
+                <ul class="nav-menu">
+                    <li><a href="../../../../index.html">Início</a></li>
+                    <li><a href="../player/library.html">Biblioteca</a></li>
+                    <li><a href="../player/player.html">Player</a></li>
+                    <li><a href="../info/about.html">Sobre Nós</a></li>
+                    <li><a href="../login/account.html" class="active btn-account"><i class="fas fa-user"></i> Minha Conta</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Configurações da Conta -->
+    <main class="account-main">
+        <div class="container">
+            <div class="account-layout">
+                <!-- Sidebar de Navegação -->
+                <aside class="account-sidebar">
+                    <div class="user-profile">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="profile-info">
+                            <h3 id="userName">Usuário Harmony</h3>
+                            <p id="userEmail">usuario@harmony.com</p>
+                            <span class="user-plan">Plano Free</span>
+                        </div>
+                    </div>
+                    
+                    <nav class="account-nav">
+                        <ul>
+                            <li><a href="#profile" class="active"><i class="fas fa-user"></i> Perfil</a></li>
+                            <li><a href="#preferences"><i class="fas fa-sliders-h"></i> Preferências</a></li>
+                            <li><a href="#privacy"><i class="fas fa-shield-alt"></i> Privacidade</a></li>
+                            <li><a href="#subscription"><i class="fas fa-crown"></i> Assinatura</a></li>
+                            <li><a href="#notifications"><i class="fas fa-bell"></i> Notificações</a></li>
+                            <li><a href="#security"><i class="fas fa-lock"></i> Segurança</a></li>
+                            <li><a href="#advanced"><i class="fas fa-cog"></i> Avançado</a></li>
+                        </ul>
+                        
+                        <div class="nav-footer">
+                            <a href="../../../../index.html" class="btn-secondary btn-block">
+                                <i class="fas fa-home"></i> Voltar ao Início
+                            </a>
+                            <button class="btn-logout">
+                                <i class="fas fa-sign-out-alt"></i> Sair
+                            </button>
+                        </div>
+                    </nav>
+                </aside>
+                
+                <!-- Conteúdo Principal -->
+                <div class="account-content">
+                    <!-- Seção Perfil -->
+                    <section id="profile" class="account-section active">
+                        <h2><i class="fas fa-user"></i> Perfil do Usuário</h2>
+                        
+                        <div class="profile-editor">
+                            <div class="profile-header">
+                                <div class="avatar-upload">
+                                    <div class="avatar-preview">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                    <div class="avatar-controls">
+                                        <button class="btn-small" id="changeAvatar">
+                                            <i class="fas fa-camera"></i> Alterar Foto
+                                        </button>
+                                        <button class="btn-small btn-danger" id="removeAvatar">
+                                            <i class="fas fa-trash"></i> Remover
+                                        </button>
+                                        <p class="avatar-hint">JPEG ou PNG, máximo 2MB</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <form id="profileForm" class="account-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="firstName">Nome</label>
+                                        <input type="text" id="firstName" name="firstName" value="Usuário" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lastName">Sobrenome</label>
+                                        <input type="text" id="lastName" name="lastName" value="Harmony" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="username">Nome de usuário</label>
+                                    <div class="input-with-action">
+                                        <input type="text" id="username" name="username" value="usuario_harmony" required>
+                                        <button type="button" class="btn-action-inline" id="checkUsername">
+                                            Verificar disponibilidade
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="email">E-mail</label>
+                                    <input type="email" id="email" name="email" value="usuario@harmony.com" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="bio">Biografia</label>
+                                    <textarea id="bio" name="bio" rows="4" placeholder="Conte um pouco sobre você...">Amante de música e explorador de novos sons.</textarea>
+                                    <div class="char-count">
+                                        <span id="bioChars">0</span>/200 caracteres
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="location">Localização</label>
+                                    <input type="text" id="location" name="location" placeholder="Sua cidade, país">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="website">Website</label>
+                                    <input type="url" id="website" name="website" placeholder="https://seusite.com">
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="reset" class="btn-secondary">Cancelar</button>
+                                    <button type="submit" class="btn-primary">Salvar Alterações</button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                    
+                    <!-- Seção Preferências -->
+                    <section id="preferences" class="account-section">
+                        <h2><i class="fas fa-sliders-h"></i> Preferências do Player</h2>
+                        
+                        <form id="preferencesForm" class="account-form">
+                            <div class="form-group">
+                                <label>Tema da Interface</label>
+                                <div class="theme-selector">
+                                    <div class="theme-option active" data-theme="light">
+                                        <div class="theme-preview light"></div>
+                                        <span>Claro</span>
+                                    </div>
+                                    <div class="theme-option" data-theme="dark">
+                                        <div class="theme-preview dark"></div>
+                                        <span>Escuro</span>
+                                    </div>
+                                    <div class="theme-option" data-theme="auto">
+                                        <div class="theme-preview auto"></div>
+                                        <span>Automático</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="audioQuality">Qualidade de Áudio</label>
+                                <select id="audioQuality" name="audioQuality">
+                                    <option value="low">Baixa (para conexões lentas)</option>
+                                    <option value="medium" selected>Média (padrão)</option>
+                                    <option value="high">Alta (qualidade máxima)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="crossfade">Crossfade entre músicas</label>
+                                <div class="range-with-value">
+                                    <input type="range" id="crossfade" name="crossfade" min="0" max="10" value="3">
+                                    <span id="crossfadeValue">3 segundos</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="defaultVolume">Volume padrão</label>
+                                <div class="range-with-value">
+                                    <input type="range" id="defaultVolume" name="defaultVolume" min="0" max="100" value="70">
+                                    <span id="defaultVolumeValue">70%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="autoplay" checked>
+                                    <span class="checkmark"></span>
+                                    Reproduzir automaticamente a próxima música
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="showLyrics" checked>
+                                    <span class="checkmark"></span>
+                                    Mostrar letras automaticamente
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="highContrast">
+                                    <span class="checkmark"></span>
+                                    Modo de alto contraste
+                                </label>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="reset" class="btn-secondary">Restaurar Padrões</button>
+                                <button type="submit" class="btn-primary">Salvar Preferências</button>
+                            </div>
+                        </form>
+                    </section>
+                    
+                    <!-- Seção Privacidade -->
+                    <section id="privacy" class="account-section">
+                        <h2><i class="fas fa-shield-alt"></i> Configurações de Privacidade</h2>
+                        
+                        <form id="privacyForm" class="account-form">
+                            <div class="form-group">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="profilePublic" checked>
+                                    <span class="checkmark"></span>
+                                    Perfil público (qualquer pessoa pode ver seu perfil)
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="showListeningActivity" checked>
+                                    <span class="checkmark"></span>
+                                    Mostrar atividade de escuta no perfil
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="showPlaylists">
+                                    <span class="checkmark"></span>
+                                    Mostrar minhas playlists publicamente
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="allowMessages">
+                                    <span class="checkmark"></span>
+                                    Permitir mensagens de outros usuários
+                                </label>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="dataRetention">Retenção de Dados</label>
+                                <select id="dataRetention" name="dataRetention">
+                                    <option value="30">30 dias</option>
+                                    <option value="90" selected>90 dias</option>
+                                    <option value="365">1 ano</option>
+                                    <option value="forever">Para sempre</option>
+                                </select>
+                                <p class="form-hint">Por quanto tempo mantemos seus dados de histórico de escuta</p>
+                            </div>
+                            
+                            <div class="privacy-actions">
+                                <button type="button" class="btn-secondary" id="exportData">
+                                    <i class="fas fa-download"></i> Exportar Meus Dados
+                                </button>
+                                <button type="button" class="btn-danger" id="deleteAccount">
+                                    <i class="fas fa-trash"></i> Excluir Minha Conta
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+                    
+                    <!-- Outras seções teriam conteúdo similar -->
+                    
+                    <div class="account-footer">
+                        <p><i class="fas fa-info-circle"></i> Projeto Harmony - Versão 1.0.0</p>
+                        <p>Desenvolvido para o curso de Programador Web</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Harmony</h3>
+                    <p>Uma plataforma de streaming musical desenvolvida como projeto para o curso de Programador Web.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links Rápidos</h4>
+                    <ul>
+                        <li><a href="../../../../index.html">Início</a></li>
+                        <li><a href="../player/library.html">Biblioteca</a></li>
+                        <li><a href="../player/player.html">Player</a></li>
+                        <li><a href="../info/about.html">Sobre Nós</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Conta</h4>
+                    <ul>
+                        <li><a href="../login/login.html">Login</a></li>
+                        <li><a href="../login/signup.html">Cadastrar</a></li>
+                        <li><a href="../login/account.html">Configurações</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Desenvolvedor</h4>
+                    <p>Projeto desenvolvido por um único programador para o curso de Programador Web.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Harmony. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../../js/login/auth.js"></script>
+    <script src="../../js/helper/utils.js"></script>
+</body>
+</html>
