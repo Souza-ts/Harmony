@@ -1,12 +1,95 @@
-// Sistema de Autenticação Harmony
+// Sistema de Autenticação Harmony - COMPLETO E FUNCIONAL
 document.addEventListener('DOMContentLoaded', function() {
-    // Verificar se estamos na página de login ou cadastro
-    const loginForm = document.getElementById('loginForm');
-    const signupForm = document.getElementById('signupForm');
-    const togglePasswordBtns = document.querySelectorAll('.toggle-password');
+    console.log('Auth.js carregado');
     
-    // Toggle visibilidade da senha
-    togglePasswordBtns.forEach(btn => {
+    // Verificar página atual
+    const isLoginPage = window.location.pathname.includes('login.html');
+    const isSignupPage = window.location.pathname.includes('signup.html');
+    
+    // Inicializar funcionalidades baseado na página
+    if (isLoginPage) {
+        initLoginPage();
+    } else if (isSignupPage) {
+        initSignupPage();
+    }
+    
+    // Verificar se usuário já está logado
+    checkLoginStatus();
+    
+    // Inicializar notificações
+    initNotificationSystem();
+});
+
+// Inicializar página de login
+function initLoginPage() {
+    const loginForm = document.getElementById('loginForm');
+    if (!loginForm) return;
+    
+    console.log('Inicializando página de login');
+    
+    // Configurar toggle de senha
+    const togglePassword = document.getElementById('togglePassword');
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        });
+    }
+    
+    // Preencher credenciais de teste (apenas para desenvolvimento)
+    document.getElementById('email').value = 'teste@harmony.com';
+    document.getElementById('password').value = 'senha123';
+    
+    // Configurar submit do formulário
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('Formulário de login enviado');
+        
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const remember = document.getElementById('remember')?.checked || false;
+        
+        // Validação
+        if (!validateEmail(email)) {
+            showNotification('Por favor, insira um e-mail válido.', 'error');
+            return;
+        }
+        
+        if (password.length < 6) {
+            showNotification('A senha deve ter pelo menos 6 caracteres.', 'error');
+            return;
+        }
+        
+        // Processar login
+        processLogin(email, password, remember);
+    });
+    
+    // Configurar login social
+    document.querySelectorAll('.btn-social').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const provider = this.classList.contains('google') ? 'Google' : 'GitHub';
+            showNotification(`Login com ${provider} será implementado em breve.`, 'info');
+        });
+    });
+}
+
+// Inicializar página de cadastro
+function initSignupPage() {
+    const signupForm = document.getElementById('signupForm');
+    if (!signupForm) return;
+    
+    console.log('Inicializando página de cadastro');
+    
+    // Configurar toggles de senha
+    document.querySelectorAll('.toggle-password').forEach(btn => {
         btn.addEventListener('click', function() {
             const targetId = this.getAttribute('data-target') || 'password';
             const passwordInput = document.getElementById(targetId);
@@ -22,419 +105,434 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Validação de força da senha (cadastro)
+    // Configurar força da senha
     const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
-    const strengthBar = document.querySelector('.strength-bar');
-    const strengthValue = document.getElementById('strengthValue');
-    const passwordMatchIcon = document.getElementById('passwordMatchIcon');
-    const passwordMatchText = document.getElementById('passwordMatchText');
-    
     if (passwordInput) {
         passwordInput.addEventListener('input', function() {
-            checkPasswordStrength(this.value);
+            updatePasswordStrength(this.value);
             checkPasswordMatch();
         });
     }
     
-    if (confirmPasswordInput) {
-        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+    // Configurar confirmação de senha
+    const confirmInput = document.getElementById('confirmPassword');
+    if (confirmInput) {
+        confirmInput.addEventListener('input', checkPasswordMatch);
     }
     
-    // Verificar força da senha
-    function checkPasswordStrength(password) {
-        let strength = 0;
-        const strengthBarElem = document.querySelector('.strength-bar');
-        
-        // Verificar comprimento
-        if (password.length >= 8) strength += 25;
-        if (password.length >= 12) strength += 15;
-        
-        // Verificar complexidade
-        if (/[A-Z]/.test(password)) strength += 20;
-        if (/[a-z]/.test(password)) strength += 20;
-        if (/[0-9]/.test(password)) strength += 20;
-        if (/[^A-Za-z0-9]/.test(password)) strength += 20;
-        
-        // Limitar a 100%
-        strength = Math.min(strength, 100);
-        
-        // Atualizar barra de força
-        strengthBarElem.style.setProperty('--strength-width', `${strength}%`);
-        
-        // Atualizar cor e texto
-        let color, text;
-        if (strength < 40) {
-            color = 'var(--danger-color)';
-            text = 'Fraca';
-        } else if (strength < 70) {
-            color = 'var(--warning-color)';
-            text = 'Média';
-        } else if (strength < 90) {
-            color = '#4CAF50';
-            text = 'Forte';
-        } else {
-            color = 'var(--success-color)';
-            text = 'Muito Forte';
-        }
-        
-        strengthBarElem.style.setProperty('--strength-color', color);
-        strengthBarElem.querySelector('::after').style.backgroundColor = color;
-        strengthValue.textContent = text;
-        strengthValue.style.color = color;
+    // Configurar validação de nome de usuário
+    const usernameInput = document.getElementById('username');
+    if (usernameInput) {
+        usernameInput.addEventListener('blur', function() {
+            if (this.value.length > 0 && this.value.length < 3) {
+                showNotification('Nome de usuário deve ter pelo menos 3 caracteres.', 'warning');
+            }
+        });
     }
     
-    // Verificar se as senhas coincidem
-    function checkPasswordMatch() {
-        if (!passwordInput || !confirmPasswordInput) return;
+    // Configurar data de nascimento (limitar a 18+ anos)
+    const birthDateInput = document.getElementById('birthDate');
+    if (birthDateInput) {
+        const today = new Date();
+        const maxDate = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate());
+        birthDateInput.max = maxDate.toISOString().split('T')[0];
         
-        const password = passwordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
+        // Definir data padrão para 18 anos atrás
+        const defaultDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+        birthDateInput.value = defaultDate.toISOString().split('T')[0];
+    }
+    
+    // Configurar submit do formulário
+    signupForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('Formulário de cadastro enviado');
         
-        if (confirmPassword === '') {
-            passwordMatchText.textContent = '';
-            passwordMatchIcon.classList.add('hidden');
+        // Coletar dados
+        const formData = {
+            firstName: document.getElementById('firstName').value.trim(),
+            lastName: document.getElementById('lastName').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            username: document.getElementById('username').value.trim(),
+            password: document.getElementById('password').value,
+            confirmPassword: document.getElementById('confirmPassword').value,
+            birthDate: document.getElementById('birthDate').value,
+            terms: document.getElementById('terms').checked,
+            newsletter: document.getElementById('newsletter')?.checked || false
+        };
+        
+        // Validar dados
+        const validation = validateSignupForm(formData);
+        if (!validation.isValid) {
+            showNotification(validation.message, 'error');
             return;
         }
         
-        if (password === confirmPassword) {
-            passwordMatchText.textContent = 'As senhas coincidem';
-            passwordMatchText.style.color = 'var(--success-color)';
-            passwordMatchIcon.classList.remove('hidden');
-        } else {
-            passwordMatchText.textContent = 'As senhas não coincidem';
-            passwordMatchText.style.color = 'var(--danger-color)';
-            passwordMatchIcon.classList.add('hidden');
+        // Processar cadastro
+        processSignup(formData);
+    });
+}
+
+// Validar formulário de cadastro
+function validateSignupForm(formData) {
+    // Verificar campos obrigatórios
+    const requiredFields = ['firstName', 'lastName', 'email', 'username', 'password', 'confirmPassword', 'birthDate'];
+    for (const field of requiredFields) {
+        if (!formData[field] || formData[field].toString().trim() === '') {
+            return {
+                isValid: false,
+                message: 'Por favor, preencha todos os campos obrigatórios.'
+            };
         }
     }
     
-    // Validação do formulário de login
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const remember = document.getElementById('remember').checked;
-            
-            // Validação básica
-            if (!email || !password) {
-                showNotification('Por favor, preencha todos os campos.', 'error');
-                return;
-            }
-            
-            // Simular autenticação (em um projeto real, faria uma requisição ao servidor)
-            simulateLogin(email, password, remember);
-        });
+    // Verificar termos
+    if (!formData.terms) {
+        return {
+            isValid: false,
+            message: 'Você deve aceitar os Termos de Serviço para continuar.'
+        };
     }
     
-    // Validação do formulário de cadastro
-    if (signupForm) {
-        signupForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Obter valores do formulário
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const birthDate = document.getElementById('birthDate').value;
-            const terms = document.getElementById('terms').checked;
-            
-            // Validações
-            if (!firstName || !lastName || !email || !username || !password || !confirmPassword || !birthDate) {
-                showNotification('Por favor, preencha todos os campos obrigatórios.', 'error');
-                return;
-            }
-            
-            if (!terms) {
-                showNotification('Você deve aceitar os Termos de Serviço para continuar.', 'error');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showNotification('As senhas não coincidem.', 'error');
-                return;
-            }
-            
-            if (password.length < 8) {
-                showNotification('A senha deve ter pelo menos 8 caracteres.', 'error');
-                return;
-            }
-            
-            // Calcular idade a partir da data de nascimento
-            const birthDateObj = new Date(birthDate);
-            const today = new Date();
-            let age = today.getFullYear() - birthDateObj.getFullYear();
-            const monthDiff = today.getMonth() - birthDateObj.getMonth();
-            
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
-                age--;
-            }
-            
-            if (age < 13) {
-                showNotification('Você deve ter pelo menos 13 anos para criar uma conta.', 'error');
-                return;
-            }
-            
-            // Simular cadastro bem-sucedido
-            simulateSignup({
-                firstName,
-                lastName,
-                email,
-                username,
-                password,
-                birthDate
-            });
-        });
+    // Validar e-mail
+    if (!validateEmail(formData.email)) {
+        return {
+            isValid: false,
+            message: 'Por favor, insira um e-mail válido.'
+        };
     }
     
-    // Login social
-    const googleLoginBtn = document.querySelector('.btn-social.google');
-    const githubLoginBtn = document.querySelector('.btn-social.github');
-    
-    if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', function() {
-            showNotification('Login com Google não está disponível na versão de demonstração.', 'info');
-        });
+    // Validar nome de usuário
+    if (formData.username.length < 3) {
+        return {
+            isValid: false,
+            message: 'Nome de usuário deve ter pelo menos 3 caracteres.'
+        };
     }
     
-    if (githubLoginBtn) {
-        githubLoginBtn.addEventListener('click', function() {
-            showNotification('Login com GitHub não está disponível na versão de demonstração.', 'info');
-        });
+    // Validar senha
+    if (formData.password.length < 8) {
+        return {
+            isValid: false,
+            message: 'A senha deve ter pelo menos 8 caracteres.'
+        };
     }
     
-    // Simular processo de login
-    function simulateLogin(email, password, remember) {
-        // Mostrar indicador de carregamento
-        const submitBtn = loginForm.querySelector('.btn-primary');
-        const originalText = submitBtn.textContent;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
-        submitBtn.disabled = true;
-        
-        // Simular atraso de rede
-        setTimeout(() => {
-            // Verificar credenciais de teste
-            if (email === 'teste@harmony.com' && password === 'senha123') {
-                // Salvar informações do usuário (em localStorage para demonstração)
-                const userData = {
-                    email: email,
-                    name: 'Usuário Teste',
-                    username: 'teste',
-                    loggedIn: true,
-                    remember: remember
-                };
-                
-                localStorage.setItem('harmony_user', JSON.stringify(userData));
-                
-                showNotification('Login realizado com sucesso! Redirecionando...', 'success');
-                
-                // Redirecionar após 1,5 segundos
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-            } else {
-                showNotification('E-mail ou senha incorretos. Use teste@harmony.com / senha123 para demo.', 'error');
-                
-                // Restaurar botão
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }
-        }, 1500);
+    // Verificar se as senhas coincidem
+    if (formData.password !== formData.confirmPassword) {
+        return {
+            isValid: false,
+            message: 'As senhas não coincidem.'
+        };
     }
     
-    // Simular processo de cadastro
-    function simulateSignup(userData) {
-        // Mostrar indicador de carregamento
-        const submitBtn = signupForm.querySelector('.btn-primary');
-        const originalText = submitBtn.textContent;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando conta...';
-        submitBtn.disabled = true;
-        
-        // Simular atraso de rede
-        setTimeout(() => {
-            // Salvar informações do usuário (em localStorage para demonstração)
-            const userToSave = {
-                email: userData.email,
-                name: `${userData.firstName} ${userData.lastName}`,
-                username: userData.username,
-                loggedIn: true
+    // Validar idade (pelo menos 13 anos)
+    const birthDate = new Date(formData.birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    
+    if (age < 13) {
+        return {
+            isValid: false,
+            message: 'Você deve ter pelo menos 13 anos para criar uma conta.'
+        };
+    }
+    
+    return { isValid: true, message: 'Validação bem-sucedida.' };
+}
+
+// Atualizar força da senha
+function updatePasswordStrength(password) {
+    const strengthBar = document.querySelector('.strength-bar');
+    const strengthValue = document.getElementById('strengthValue');
+    
+    if (!strengthBar || !strengthValue) return;
+    
+    let strength = 0;
+    
+    // Critérios de força
+    if (password.length >= 8) strength += 25;
+    if (password.length >= 12) strength += 15;
+    if (/[A-Z]/.test(password)) strength += 20;
+    if (/[a-z]/.test(password)) strength += 20;
+    if (/[0-9]/.test(password)) strength += 20;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+    
+    strength = Math.min(strength, 100);
+    
+    // Atualizar barra visual
+    strengthBar.style.width = `${strength}%`;
+    
+    // Atualizar texto e cor
+    let color, text;
+    if (strength < 40) {
+        color = 'var(--danger-color)';
+        text = 'Fraca';
+    } else if (strength < 70) {
+        color = 'var(--warning-color)';
+        text = 'Média';
+    } else if (strength < 90) {
+        color = '#4CAF50';
+        text = 'Forte';
+    } else {
+        color = 'var(--success-color)';
+        text = 'Muito Forte';
+    }
+    
+    strengthBar.style.backgroundColor = color;
+    strengthValue.textContent = text;
+    strengthValue.style.color = color;
+}
+
+// Verificar se as senhas coincidem
+function checkPasswordMatch() {
+    const password = document.getElementById('password')?.value || '';
+    const confirmPassword = document.getElementById('confirmPassword')?.value || '';
+    const matchIcon = document.getElementById('passwordMatchIcon');
+    const matchText = document.getElementById('passwordMatchText');
+    
+    if (!matchIcon || !matchText) return;
+    
+    if (confirmPassword === '') {
+        matchText.textContent = '';
+        matchIcon.className = 'fas fa-check';
+        matchIcon.classList.remove('visible');
+        return;
+    }
+    
+    if (password === confirmPassword) {
+        matchText.textContent = 'As senhas coincidem';
+        matchText.style.color = 'var(--success-color)';
+        matchIcon.className = 'fas fa-check';
+        matchIcon.style.color = 'var(--success-color)';
+        matchIcon.classList.add('visible');
+    } else {
+        matchText.textContent = 'As senhas não coincidem';
+        matchText.style.color = 'var(--danger-color)';
+        matchIcon.className = 'fas fa-times';
+        matchIcon.style.color = 'var(--danger-color)';
+        matchIcon.classList.add('visible');
+    }
+}
+
+// Validar e-mail
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// Processar login
+function processLogin(email, password, remember) {
+    const submitBtn = document.querySelector('#loginForm .btn-primary');
+    const originalText = submitBtn.innerHTML;
+    
+    // Mostrar estado de carregamento
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+    submitBtn.disabled = true;
+    
+    // Simular delay de rede
+    setTimeout(() => {
+        // Credenciais de teste (em produção, seria uma requisição AJAX)
+        if (email === 'teste@harmony.com' && password === 'senha123') {
+            // Criar objeto de usuário
+            const user = {
+                id: 1,
+                firstName: 'Usuário',
+                lastName: 'Teste',
+                email: email,
+                username: 'teste',
+                avatar: null,
+                plan: 'free',
+                createdAt: new Date().toISOString(),
+                settings: {
+                    theme: 'light',
+                    notifications: true,
+                    autoplay: true
+                }
             };
             
-            localStorage.setItem('harmony_user', JSON.stringify(userToSave));
+            // Salvar no localStorage
+            localStorage.setItem('harmony_user', JSON.stringify(user));
             
-            showNotification('Conta criada com sucesso! Redirecionando...', 'success');
+            // Salvar token de sessão
+            localStorage.setItem('harmony_token', 'demo_token_' + Date.now());
             
-            // Redirecionar após 1,5 segundos
-            setTimeout(() => {
-                window.location.href = '../../../../index.html';
-            }, 1500);
-        }, 2000);
-    }
-    
-    // Mostrar notificação
-    function showNotification(message, type = 'info') {
-        // Remover notificações anteriores
-        const existingNotification = document.querySelector('.notification');
-        if (existingNotification) {
-            existingNotification.remove();
-        }
-        
-        // Criar elemento de notificação
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        
-        // Ícone baseado no tipo
-        let icon;
-        switch(type) {
-            case 'success':
-                icon = 'fas fa-check-circle';
-                break;
-            case 'error':
-                icon = 'fas fa-exclamation-circle';
-                break;
-            case 'warning':
-                icon = 'fas fa-exclamation-triangle';
-                break;
-            default:
-                icon = 'fas fa-info-circle';
-        }
-        
-        notification.innerHTML = `
-            <div class="notification-content">
-                <i class="${icon}"></i>
-                <span>${message}</span>
-            </div>
-            <button class="notification-close">&times;</button>
-        `;
-        
-        // Adicionar ao corpo do documento
-        document.body.appendChild(notification);
-        
-        // Mostrar notificação com animação
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-        
-        // Fechar notificação após 5 segundos
-        const autoClose = setTimeout(() => {
-            closeNotification(notification);
-        }, 5000);
-        
-        // Fechar ao clicar no botão
-        const closeBtn = notification.querySelector('.notification-close');
-        closeBtn.addEventListener('click', () => {
-            clearTimeout(autoClose);
-            closeNotification(notification);
-        });
-    }
-    
-    // Fechar notificação
-    function closeNotification(notification) {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
+            // Configurar lembrar-me
+            if (remember) {
+                localStorage.setItem('harmony_remember', 'true');
             }
-        }, 300);
+            
+            showNotification('Login realizado com sucesso!', 'success');
+            
+            // Redirecionar após 1 segundo
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+            
+        } else {
+            showNotification('E-mail ou senha incorretos. Use: teste@harmony.com / senha123', 'error');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }, 1500);
+}
+
+// Processar cadastro
+function processSignup(formData) {
+    const submitBtn = document.querySelector('#signupForm .btn-primary');
+    const originalText = submitBtn.innerHTML;
+    
+    // Mostrar estado de carregamento
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando conta...';
+    submitBtn.disabled = true;
+    
+    // Simular delay de rede
+    setTimeout(() => {
+        // Criar objeto de usuário
+        const user = {
+            id: Date.now(),
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            username: formData.username,
+            birthDate: formData.birthDate,
+            avatar: null,
+            plan: 'free',
+            newsletter: formData.newsletter,
+            createdAt: new Date().toISOString(),
+            settings: {
+                theme: 'light',
+                notifications: true,
+                autoplay: true
+            }
+        };
+        
+        // Verificar se já existe usuário com este e-mail
+        const existingUsers = JSON.parse(localStorage.getItem('harmony_users') || '[]');
+        const userExists = existingUsers.some(u => u.email === user.email);
+        
+        if (userExists) {
+            showNotification('Este e-mail já está cadastrado.', 'error');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            return;
+        }
+        
+        // Adicionar novo usuário à lista
+        existingUsers.push(user);
+        localStorage.setItem('harmony_users', JSON.stringify(existingUsers));
+        
+        // Fazer login automático
+        localStorage.setItem('harmony_user', JSON.stringify(user));
+        localStorage.setItem('harmony_token', 'demo_token_' + Date.now());
+        
+        showNotification('Conta criada com sucesso!', 'success');
+        
+        // Redirecionar após 1 segundo
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1000);
+        
+    }, 2000);
+}
+
+// Verificar status de login
+function checkLoginStatus() {
+    const user = localStorage.getItem('harmony_user');
+    const token = localStorage.getItem('harmony_token');
+    
+    if (user && token) {
+        // Usuário está logado
+        const userData = JSON.parse(user);
+        
+        // Atualizar UI se estiver em páginas protegidas
+        updateUIForLoggedInUser(userData);
+        
+        // Redirecionar de login/cadastro se já estiver logado
+        if (window.location.pathname.includes('login.html') || 
+            window.location.pathname.includes('signup.html')) {
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+    } else {
+        // Usuário não está logado
+        // Redirecionar de páginas protegidas se não estiver logado
+        if (window.location.pathname.includes('account.html')) {
+            window.location.href = '../../../../index.html';
+        }
+    }
+}
+
+// Atualizar UI para usuário logado
+function updateUIForLoggedInUser(userData) {
+    // Atualizar links de conta
+    const accountLinks = document.querySelectorAll('a[href="account.html"]');
+    accountLinks.forEach(link => {
+        if (link.querySelector('.fa-user')) {
+            link.innerHTML = `<i class="fas fa-user"></i> ${userData.firstName}`;
+        }
+    });
+    
+    // Esconder links de login/cadastro
+    const loginLinks = document.querySelectorAll('a[href="login.html"]');
+    const signupLinks = document.querySelectorAll('a[href="signup.html"]');
+    
+    loginLinks.forEach(link => link.style.display = 'none');
+    signupLinks.forEach(link => link.style.display = 'none');
+}
+
+// Inicializar sistema de notificações
+function initNotificationSystem() {
+    // CSS para notificações já está no style.css
+}
+
+// Mostrar notificação
+function showNotification(message, type = 'info') {
+    // Remover notificações existentes
+    const existing = document.querySelector('.notification');
+    if (existing) existing.remove();
+    
+    // Criar notificação
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    
+    // Ícone baseado no tipo
+    let icon;
+    switch(type) {
+        case 'success': icon = 'fas fa-check-circle'; break;
+        case 'error': icon = 'fas fa-exclamation-circle'; break;
+        case 'warning': icon = 'fas fa-exclamation-triangle'; break;
+        default: icon = 'fas fa-info-circle';
     }
     
-    // Inicializar verificação de força da senha se estiver na página de cadastro
-    if (passwordInput && passwordInput.value) {
-        checkPasswordStrength(passwordInput.value);
-    }
-    
-    // Adicionar CSS para notificações dinamicamente
-    const notificationStyles = document.createElement('style');
-    notificationStyles.textContent = `
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-            z-index: 10000;
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
-            max-width: 400px;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification-success {
-            border-left-color: var(--success-color);
-        }
-        
-        .notification-error {
-            border-left-color: var(--danger-color);
-        }
-        
-        .notification-warning {
-            border-left-color: var(--warning-color);
-        }
-        
-        .notification-info {
-            border-left-color: var(--primary-color);
-        }
-        
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-        }
-        
-        .notification-content i {
-            font-size: 1.2rem;
-        }
-        
-        .notification-success .notification-content i {
-            color: var(--success-color);
-        }
-        
-        .notification-error .notification-content i {
-            color: var(--danger-color);
-        }
-        
-        .notification-warning .notification-content i {
-            color: var(--warning-color);
-        }
-        
-        .notification-info .notification-content i {
-            color: var(--primary-color);
-        }
-        
-        .notification-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray-color);
-            transition: var(--transition);
-            line-height: 1;
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .notification-close:hover {
-            color: var(--dark-color);
-        }
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="${icon}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="notification-close">&times;</button>
     `;
-    document.head.appendChild(notificationStyles);
-});
+    
+    document.body.appendChild(notification);
+    
+    // Animar entrada
+    setTimeout(() => notification.classList.add('show'), 10);
+    
+    // Configurar auto-fechamento
+    const autoClose = setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+    
+    // Configurar fechamento manual
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        clearTimeout(autoClose);
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    });
+}

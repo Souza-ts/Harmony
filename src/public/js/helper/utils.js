@@ -1,110 +1,69 @@
 // Utilitários gerais para o projeto Harmony
 document.addEventListener('DOMContentLoaded', function() {
-    // Menu hamburguer para responsividade
+    console.log('Utils.js carregado');
+    
+    // Inicializar funcionalidades comuns
+    initHamburgerMenu();
+    initThemeSystem();
+    checkOnlineStatus();
+    initSmoothScrolling();
+    initFormValidation();
+    
+    // Verificar login status
+    checkAuthStatus();
+});
+
+// Menu hamburguer responsivo
+function initHamburgerMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', function() {
-            navMenu.classList.toggle('active');
-            hamburger.classList.toggle('active');
-            
-            // Alternar ícone do hamburguer
-            const spans = hamburger.querySelectorAll('span');
-            if (hamburger.classList.contains('active')) {
-                spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
-                spans[1].style.opacity = '0';
-                spans[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
-            } else {
-                spans[0].style.transform = 'none';
-                spans[1].style.opacity = '1';
-                spans[2].style.transform = 'none';
-            }
+    if (!hamburger || !navMenu) return;
+    
+    hamburger.addEventListener('click', function() {
+        navMenu.classList.toggle('active');
+        hamburger.classList.toggle('active');
+    });
+    
+    // Fechar menu ao clicar em um link
+    const navLinks = navMenu.querySelectorAll('a');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+            hamburger.classList.remove('active');
         });
-        
-        // Fechar menu ao clicar em um link
-        const navLinks = navMenu.querySelectorAll('a');
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('active');
-                hamburger.classList.remove('active');
-                
-                // Restaurar ícone do hamburguer
-                const spans = hamburger.querySelectorAll('span');
-                spans[0].style.transform = 'none';
-                spans[1].style.opacity = '1';
-                spans[2].style.transform = 'none';
-            });
-        });
-    }
-    
-    // Verificar estado de login
-    checkLoginStatus();
-    
-    // Configurações de tema
-    initializeTheme();
-    
-    // Navegação entre seções na página de conta
-    initializeAccountNavigation();
-});
-
-// Verificar status de login
-function checkLoginStatus() {
-    const userData = localStorage.getItem('harmony_user');
-    const accountLinks = document.querySelectorAll('a[href="account.html"]');
-    const loginLinks = document.querySelectorAll('a[href="login.html"]');
-    const signupLinks = document.querySelectorAll('a[href="signup.html"]');
-    
-    if (userData) {
-        const user = JSON.parse(userData);
-        
-        // Atualizar links de conta se o usuário estiver logado
-        accountLinks.forEach(link => {
-            if (link.querySelector('.fa-user')) {
-                link.innerHTML = `<i class="fas fa-user"></i> ${user.name || 'Minha Conta'}`;
-            }
-        });
-        
-        // Esconder links de login/cadastro em algumas páginas
-        if (window.location.pathname.includes('account.html') || 
-            window.location.pathname.includes('library.html') ||
-            window.location.pathname.includes('player.html')) {
-            
-            loginLinks.forEach(link => link.style.display = 'none');
-            signupLinks.forEach(link => link.style.display = 'none');
-        }
-    } else {
-        // Se não estiver logado, redirecionar da página de conta
-        if (window.location.pathname.includes('account.html')) {
-            window.location.href = 'login.html';
-        }
-    }
+    });
 }
 
-// Inicializar configurações de tema
-function initializeTheme() {
-    // Verificar preferência salva
-    const savedTheme = localStorage.getItem('harmony_theme') || 'light';
+// Sistema de tema
+function initThemeSystem() {
+    // Verificar tema salvo ou preferência do sistema
+    const savedTheme = localStorage.getItem('harmony_theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    let theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
     
     // Aplicar tema
-    applyTheme(savedTheme);
+    applyTheme(theme);
     
-    // Configurar botões de tema se existirem
-    const themeOptions = document.querySelectorAll('.theme-option');
-    themeOptions.forEach(option => {
-        if (option.dataset.theme === savedTheme) {
-            option.classList.add('active');
-        }
-        
+    // Configurar botões de tema
+    document.querySelectorAll('.theme-option').forEach(option => {
         option.addEventListener('click', function() {
-            const theme = this.dataset.theme;
-            applyTheme(theme);
-            localStorage.setItem('harmony_theme', theme);
+            const selectedTheme = this.dataset.theme;
+            applyTheme(selectedTheme);
+            localStorage.setItem('harmony_theme', selectedTheme);
             
             // Atualizar UI
-            themeOptions.forEach(opt => opt.classList.remove('active'));
+            document.querySelectorAll('.theme-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
             this.classList.add('active');
         });
+        
+        // Marcar opção ativa
+        if (option.dataset.theme === theme) {
+            option.classList.add('active');
+        }
     });
 }
 
@@ -113,8 +72,7 @@ function applyTheme(theme) {
     if (theme === 'dark') {
         document.body.classList.add('dark-theme');
     } else if (theme === 'auto') {
-        // Verificar preferência do sistema
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.body.classList.add('dark-theme');
         } else {
             document.body.classList.remove('dark-theme');
@@ -124,51 +82,122 @@ function applyTheme(theme) {
     }
 }
 
-// Inicializar navegação na página de conta
-function initializeAccountNavigation() {
-    if (!window.location.pathname.includes('account.html')) return;
+// Verificar status de autenticação
+function checkAuthStatus() {
+    const user = localStorage.getItem('harmony_user');
     
-    const navLinks = document.querySelectorAll('.account-nav a');
-    const sections = document.querySelectorAll('.account-section');
+    if (user) {
+        try {
+            const userData = JSON.parse(user);
+            updateAuthUI(userData);
+        } catch (e) {
+            console.error('Erro ao analisar dados do usuário:', e);
+        }
+    }
+}
+
+// Atualizar UI baseada no status de autenticação
+function updateAuthUI(userData) {
+    // Atualizar nome do usuário em elementos específicos
+    const userElements = document.querySelectorAll('[data-user-name]');
+    userElements.forEach(element => {
+        if (element.dataset.userName === 'full') {
+            element.textContent = `${userData.firstName} ${userData.lastName}`;
+        } else if (element.dataset.userName === 'first') {
+            element.textContent = userData.firstName;
+        }
+    });
     
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+    // Atualizar e-mail do usuário
+    const emailElements = document.querySelectorAll('[data-user-email]');
+    emailElements.forEach(element => {
+        element.textContent = userData.email;
+    });
+}
+
+// Verificar status de conexão
+function checkOnlineStatus() {
+    if (!navigator.onLine) {
+        showNotification('Você está offline. Algumas funcionalidades podem não estar disponíveis.', 'warning');
+    }
+    
+    window.addEventListener('online', () => {
+        showNotification('Conexão restaurada!', 'success');
+    });
+    
+    window.addEventListener('offline', () => {
+        showNotification('Você está offline.', 'warning');
+    });
+}
+
+// Scroll suave para âncoras
+function initSmoothScrolling() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            
+            if (href === '#') return;
+            
             e.preventDefault();
+            const targetElement = document.querySelector(href);
             
-            const targetId = this.getAttribute('href').substring(1);
-            
-            // Atualizar links ativos
-            navLinks.forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Mostrar seção correspondente
-            sections.forEach(section => {
-                section.classList.remove('active');
-                if (section.id === targetId) {
-                    section.classList.add('active');
-                }
-            });
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+}
+
+// Validação de formulários
+function initFormValidation() {
+    // Adicionar validação personalizada a todos os formulários
+    document.querySelectorAll('form').forEach(form => {
+        form.setAttribute('novalidate', true);
+        
+        form.addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                highlightInvalidFields(this);
+            }
         });
     });
     
-    // Verificar hash na URL
-    if (window.location.hash) {
-        const targetId = window.location.hash.substring(1);
-        const targetLink = document.querySelector(`.account-nav a[href="#${targetId}"]`);
-        const targetSection = document.getElementById(targetId);
-        
-        if (targetLink && targetSection) {
-            navLinks.forEach(l => l.classList.remove('active'));
-            targetLink.classList.add('active');
-            
-            sections.forEach(section => section.classList.remove('active'));
-            targetSection.classList.add('active');
-        }
+    // Adicionar validação em tempo real
+    document.querySelectorAll('input, select, textarea').forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+    });
+}
+
+// Destacar campos inválidos
+function highlightInvalidFields(form) {
+    const invalidFields = form.querySelectorAll(':invalid');
+    
+    invalidFields.forEach(field => {
+        field.style.borderColor = 'var(--danger-color)';
+        field.style.boxShadow = '0 0 0 3px rgba(244, 67, 54, 0.1)';
+    });
+}
+
+// Validar campo individual
+function validateField(field) {
+    if (field.validity.valid) {
+        field.style.borderColor = 'var(--success-color)';
+        field.style.boxShadow = '0 0 0 3px rgba(76, 175, 80, 0.1)';
+    } else {
+        field.style.borderColor = 'var(--danger-color)';
+        field.style.boxShadow = '0 0 0 3px rgba(244, 67, 54, 0.1)';
     }
 }
 
 // Formatar tempo (segundos para MM:SS)
 function formatTime(seconds) {
+    if (isNaN(seconds) || seconds < 0) return '0:00';
+    
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
@@ -176,7 +205,7 @@ function formatTime(seconds) {
 
 // Formatar tamanho de arquivo
 function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0 || isNaN(bytes)) return '0 Bytes';
     
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -185,31 +214,36 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-// Verificar conexão com a internet
-function checkOnlineStatus() {
-    if (!navigator.onLine) {
-        showNotification('Você está offline. Algumas funcionalidades podem não estar disponíveis.', 'warning');
-    }
-    
-    window.addEventListener('online', () => {
-        showNotification('Conexão restaurada.', 'success');
-    });
-    
-    window.addEventListener('offline', () => {
-        showNotification('Você está offline.', 'warning');
-    });
+// Debounce function para otimizar eventos
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
 
-// Inicializar verificação de conexão
-checkOnlineStatus();
+// Throttle function para limitar frequência de eventos
+function throttle(func, limit) {
+    let inThrottle;
+    return function(...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+}
 
-// Função para mostrar notificações (reutilizável)
+// Mostrar notificação (função reutilizável)
 function showNotification(message, type = 'info') {
-    // Remover notificações anteriores
-    const existingNotification = document.querySelector('.notification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
+    // Remover notificações existentes
+    const existing = document.querySelector('.notification');
+    if (existing) existing.remove();
     
     // Criar elemento de notificação
     const notification = document.createElement('div');
@@ -218,17 +252,10 @@ function showNotification(message, type = 'info') {
     // Ícone baseado no tipo
     let icon;
     switch(type) {
-        case 'success':
-            icon = 'fas fa-check-circle';
-            break;
-        case 'error':
-            icon = 'fas fa-exclamation-circle';
-            break;
-        case 'warning':
-            icon = 'fas fa-exclamation-triangle';
-            break;
-        default:
-            icon = 'fas fa-info-circle';
+        case 'success': icon = 'fas fa-check-circle'; break;
+        case 'error': icon = 'fas fa-exclamation-circle'; break;
+        case 'warning': icon = 'fas fa-exclamation-triangle'; break;
+        default: icon = 'fas fa-info-circle';
     }
     
     notification.innerHTML = `
@@ -239,20 +266,18 @@ function showNotification(message, type = 'info') {
         <button class="notification-close">&times;</button>
     `;
     
-    // Adicionar ao corpo do documento
+    // Adicionar ao DOM
     document.body.appendChild(notification);
     
-    // Mostrar notificação com animação
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
+    // Animar entrada
+    setTimeout(() => notification.classList.add('show'), 10);
     
-    // Fechar notificação após 5 segundos
+    // Configurar auto-fechamento
     const autoClose = setTimeout(() => {
         closeNotification(notification);
     }, 5000);
     
-    // Fechar ao clicar no botão
+    // Configurar fechamento manual
     const closeBtn = notification.querySelector('.notification-close');
     closeBtn.addEventListener('click', () => {
         clearTimeout(autoClose);
@@ -270,162 +295,102 @@ function closeNotification(notification) {
     }, 300);
 }
 
-// Adicionar CSS para notificações se não existir
-if (!document.querySelector('#notification-styles')) {
-    const notificationStyles = document.createElement('style');
-    notificationStyles.id = 'notification-styles';
-    notificationStyles.textContent = `
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-            z-index: 10000;
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
-            max-width: 400px;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification-success {
-            border-left-color: var(--success-color);
-        }
-        
-        .notification-error {
-            border-left-color: var(--danger-color);
-        }
-        
-        .notification-warning {
-            border-left-color: var(--warning-color);
-        }
-        
-        .notification-info {
-            border-left-color: var(--primary-color);
-        }
-        
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-        }
-        
-        .notification-content i {
-            font-size: 1.2rem;
-        }
-        
-        .notification-success .notification-content i {
-            color: var(--success-color);
-        }
-        
-        .notification-error .notification-content i {
-            color: var(--danger-color);
-        }
-        
-        .notification-warning .notification-content i {
-            color: var(--warning-color);
-        }
-        
-        .notification-info .notification-content i {
-            color: var(--primary-color);
-        }
-        
-        .notification-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray-color);
-            transition: var(--transition);
-            line-height: 1;
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .notification-close:hover {
-            color: var(--dark-color);
-        }
-        
-        /* Tema escuro para notificações */
-        body.dark-theme .notification {
-            background-color: var(--dark-color);
-            color: white;
-        }
-    `;
-    document.head.appendChild(notificationStyles);
+// Carregar dados do localStorage com tratamento de erro
+function loadFromStorage(key, defaultValue = null) {
+    try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : defaultValue;
+    } catch (e) {
+        console.error(`Erro ao carregar ${key} do localStorage:`, e);
+        return defaultValue;
+    }
 }
 
-// Adicionar CSS para tema escuro se não existir
-if (!document.querySelector('#dark-theme-styles')) {
-    const darkThemeStyles = document.createElement('style');
-    darkThemeStyles.id = 'dark-theme-styles';
-    darkThemeStyles.textContent = `
-        body.dark-theme {
-            background-color: #1a1a2e;
-            color: #e6e6e6;
+// Salvar dados no localStorage com tratamento de erro
+function saveToStorage(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    } catch (e) {
+        console.error(`Erro ao salvar ${key} no localStorage:`, e);
+        return false;
+    }
+}
+
+// Verificar se é dispositivo móvel
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Prevenir comportamento padrão de formulários
+function preventFormDefaults() {
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (this.getAttribute('data-prevent-default') === 'true') {
+                e.preventDefault();
+            }
+        });
+    });
+}
+
+// Inicializar tooltips
+function initTooltips() {
+    const tooltips = document.querySelectorAll('[data-tooltip]');
+    
+    tooltips.forEach(element => {
+        element.addEventListener('mouseenter', function() {
+            const tooltipText = this.getAttribute('data-tooltip');
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = tooltipText;
+            document.body.appendChild(tooltip);
+            
+            const rect = this.getBoundingClientRect();
+            tooltip.style.left = `${rect.left + rect.width / 2 - tooltip.offsetWidth / 2}px`;
+            tooltip.style.top = `${rect.top - tooltip.offsetHeight - 5}px`;
+            
+            this._tooltip = tooltip;
+        });
+        
+        element.addEventListener('mouseleave', function() {
+            if (this._tooltip) {
+                this._tooltip.remove();
+                this._tooltip = null;
+            }
+        });
+    });
+}
+
+// Adicionar estilos para tooltips
+if (!document.querySelector('#tooltip-styles')) {
+    const tooltipStyles = document.createElement('style');
+    tooltipStyles.id = 'tooltip-styles';
+    tooltipStyles.textContent = `
+        .tooltip {
+            position: fixed;
+            background-color: var(--dark-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            z-index: 10001;
+            pointer-events: none;
+            white-space: nowrap;
         }
         
-        body.dark-theme .main-header {
-            background-color: #16213e;
-        }
-        
-        body.dark-theme .feature-card,
-        body.dark-theme .auth-card,
-        body.dark-theme .account-sidebar,
-        body.dark-theme .account-content,
-        body.dark-theme .songs-table,
-        body.dark-theme .stat-card,
-        body.dark-theme .playlist-card,
-        body.dark-theme .modal-content {
-            background-color: #16213e;
-            color: #e6e6e6;
-        }
-        
-        body.dark-theme input,
-        body.dark-theme select,
-        body.dark-theme textarea {
-            background-color: #0f3460;
-            color: #e6e6e6;
-            border-color: #1a1a2e;
-        }
-        
-        body.dark-theme .input-with-icon input {
-            background-color: #0f3460;
-            color: #e6e6e6;
-        }
-        
-        body.dark-theme .songs-table tbody tr:hover {
-            background-color: #0f3460;
-        }
-        
-        body.dark-theme .search-box input {
-            background-color: #0f3460;
-            color: #e6e6e6;
-        }
-        
-        body.dark-theme .btn-filter {
-            background-color: #0f3460;
-            color: #e6e6e6;
-        }
-        
-        body.dark-theme .btn-filter.active {
-            background-color: var(--primary-color);
+        .tooltip:after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--dark-color) transparent transparent transparent;
         }
     `;
-    document.head.appendChild(darkThemeStyles);
+    document.head.appendChild(tooltipStyles);
 }
+
+// Inicializar tooltips após carregamento
+setTimeout(initTooltips, 1000);
