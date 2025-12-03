@@ -1,162 +1,189 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App - Aplicativo de Clima</title>
-    <link rel="stylesheet" href="src/css/style.css">
+    <title>Harmony</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/48/000000/partly-cloudy-day--v1.png">
+    <link rel="stylesheet" href="src/public/css/style.css">
 </head>
 <body>
+    <!-- Background Gradient dinâmico -->
+    <div id="background-gradient"></div>
+    
+    <!-- Container principal -->
     <div class="container">
+        <!-- Cabeçalho -->
         <header>
-            <h1><i class="fas fa-cloud-sun"></i> Weather App</h1>
-            <p class="subtitle">Verifique a previsão do tempo em qualquer cidade do mundo</p>
+            <div class="logo">
+                <i class="fas fa-music"></i>
+                <span>Harmony</span>
+            </div>
+            <nav class="main-nav">
+                <a href="#" class="nav-link active" data-page="player">
+                    <i class="fas fa-play-circle"></i> Player
+                </a>
+                <a href="#" class="nav-link" data-page="about">
+                    <i class="fas fa-user"></i> Sobre
+                </a>
+                <a href="#" class="nav-link" data-page="login">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </nav>
         </header>
 
+        <!-- Conteúdo principal -->
         <main>
-            <div class="search-container">
-                <div class="search-box">
-                    <input 
-                        type="text" 
-                        id="city-input" 
-                        placeholder="Digite o nome da cidade (ex: São Paulo, Londres, Tóquio)" 
-                        autocomplete="off"
-                    >
-                    <button id="search-btn">
-                        <i class="fas fa-search"></i> Buscar
-                    </button>
-                </div>
-                <div class="suggestions">
-                    <p class="suggestion-title">Cidades sugeridas:</p>
-                    <div class="city-buttons">
-                        <button class="city-btn" data-city="São Paulo">São Paulo</button>
-                        <button class="city-btn" data-city="Rio de Janeiro">Rio de Janeiro</button>
-                        <button class="city-btn" data-city="Brasília">Brasília</button>
-                        <button class="city-btn" data-city="Nova York">Nova York</button>
-                        <button class="city-btn" data-city="Londres">Londres</button>
-                        <button class="city-btn" data-city="Tóquio">Tóquio</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Buscando dados meteorológicos...</p>
-            </div>
-
-            <div class="weather-container" id="weather-container">
-                <!-- Informações atuais do clima -->
-                <div class="current-weather">
-                    <div class="location">
-                        <h2 id="city-name">São Paulo, BR</h2>
-                        <p id="current-date">Segunda-feira, 15 de Maio de 2023</p>
+            <!-- Player de Música -->
+            <section id="player-section" class="page-section active">
+                <div class="player-container">
+                    <div class="album-art-container">
+                        <img src="src/assets/capa/Brat.png" alt="Capa do Álbum" id="album-art" class="album-art">
+                        <div class="album-info">
+                            <h1 id="song-title">Nome da Música</h1>
+                            <p id="song-artist">Artista</p>
+                        </div>
                     </div>
                     
-                    <div class="weather-main">
-                        <div class="temp-container">
-                            <div class="current-temp">
-                                <span id="temperature">24</span>
-                                <span class="temp-unit">°C</span>
+                    <div class="player-controls">
+                        <div class="progress-container">
+                            <div class="time-display">
+                                <span id="current-time">0:00</span>
+                                <span id="total-time">0:00</span>
                             </div>
-                            <div class="weather-description">
-                                <div class="weather-icon" id="weather-icon">
-                                    <i class="fas fa-sun"></i>
-                                </div>
-                                <p id="weather-desc">Parcialmente Nublado</p>
+                            <div class="progress-bar">
+                                <div id="progress" class="progress"></div>
                             </div>
                         </div>
                         
-                        <div class="weather-details">
-                            <div class="detail-item">
-                                <i class="fas fa-temperature-high"></i>
-                                <div>
-                                    <p class="detail-label">Sensação Térmica</p>
-                                    <p class="detail-value" id="feels-like">25°C</p>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-tint"></i>
-                                <div>
-                                    <p class="detail-label">Umidade</p>
-                                    <p class="detail-value" id="humidity">65%</p>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-wind"></i>
-                                <div>
-                                    <p class="detail-label">Vento</p>
-                                    <p class="detail-value" id="wind-speed">12 km/h</p>
-                                </div>
-                            </div>
-                            <div class="detail-item">
-                                <i class="fas fa-compress-alt"></i>
-                                <div>
-                                    <p class="detail-label">Pressão</p>
-                                    <p class="detail-value" id="pressure">1013 hPa</p>
-                                </div>
-                            </div>
+                        <div class="controls">
+                            <button id="shuffle-btn" class="control-btn" title="Embaralhar">
+                                <i class="fas fa-random"></i>
+                            </button>
+                            <button id="prev-btn" class="control-btn" title="Anterior">
+                                <i class="fas fa-step-backward"></i>
+                            </button>
+                            <button id="play-btn" class="control-btn play-btn" title="Reproduzir">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button id="next-btn" class="control-btn" title="Próxima">
+                                <i class="fas fa-step-forward"></i>
+                            </button>
+                            <button id="repeat-btn" class="control-btn" title="Repetir">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="volume-control">
+                            <i class="fas fa-volume-up"></i>
+                            <input type="range" id="volume-slider" min="0" max="100" value="80">
+                        </div>
+                    </div>
+                    
+                    <div class="lyrics-container">
+                        <h3><i class="fas fa-align-left"></i> Letra da Música</h3>
+                        <div id="lyrics-display">
+                            <div class="lyric-line" data-time="0">Carregando letra...</div>
                         </div>
                     </div>
                 </div>
+            </section>
 
-                <!-- Previsão para os próximos dias -->
-                <div class="forecast">
-                    <h3><i class="fas fa-calendar-alt"></i> Previsão para os Próximos Dias</h3>
-                    <div class="forecast-cards" id="forecast-cards">
-                        <!-- Cards serão gerados dinamicamente pelo JavaScript -->
-                        <div class="forecast-card">
-                            <p class="forecast-day">Amanhã</p>
-                            <div class="forecast-icon">
-                                <i class="fas fa-cloud-rain"></i>
+            <!-- Sobre -->
+            <section id="about-section" class="page-section">
+                <div class="about-container">
+                    <h2><i class="fas fa-user"></i> Sobre o Desenvolvedor</h2>
+                    <div class="about-content">
+                        <div class="profile">
+                            <div class="avatar">
+                                <i class="fas fa-user-circle"></i>
                             </div>
-                            <div class="forecast-temp">
-                                <span class="forecast-high">26°</span>
-                                <span class="forecast-low">18°</span>
-                            </div>
+                            <h3>Desenvolvedor do Harmony</h3>
+                            <p class="tagline">Apaixonado por música e tecnologia</p>
                         </div>
-                        <!-- Mais 4 cards serão adicionados via JS -->
+                        
+                        <div class="bio">
+                            <p>Sou um desenvolvedor web apaixonado por criar experiências musicais incríveis. O Harmony Player é um projeto que combina minha paixão por música com minhas habilidades em programação.</p>
+                            
+                            <h4><i class="fas fa-code"></i> Tecnologias Utilizadas</h4>
+                            <div class="tech-stack">
+                                <span class="tech-tag">HTML5</span>
+                                <span class="tech-tag">CSS3</span>
+                                <span class="tech-tag">JavaScript</span>
+                                <span class="tech-tag">Web Audio API</span>
+                            </div>
+                            
+                            <h4><i class="fas fa-heart"></i> Características do Player</h4>
+                            <ul class="features">
+                                <li>Sincronização precisa de letras</li>
+                                <li>Gradiente dinâmico baseado na capa do álbum</li>
+                                <li>Controles intuitivos de reprodução</li>
+                                <li>Design responsivo para todos os dispositivos</li>
+                                <li>Barra de progresso interativa</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
+            </section>
 
-                <!-- Informações extras -->
-                <div class="extra-info">
-                    <div class="info-card">
-                        <h4><i class="fas fa-sun"></i> Nascer do Sol</h4>
-                        <p id="sunrise">06:45</p>
-                    </div>
-                    <div class="info-card">
-                        <h4><i class="fas fa-moon"></i> Pôr do Sol</h4>
-                        <p id="sunset">17:30</p>
-                    </div>
-                    <div class="info-card">
-                        <h4><i class="fas fa-eye"></i> Visibilidade</h4>
-                        <p id="visibility">10 km</p>
-                    </div>
-                    <div class="info-card">
-                        <h4><i class="fas fa-cloud"></i> Nebulosidade</h4>
-                        <p id="cloudiness">40%</p>
+            <!-- Login -->
+            <section id="login-section" class="page-section">
+                <div class="login-container">
+                    <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+                    
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="username">
+                                <i class="fas fa-user"></i> Nome de usuário
+                            </label>
+                            <input type="text" id="username" placeholder="Digite seu usuário" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">
+                                <i class="fas fa-lock"></i> Senha
+                            </label>
+                            <input type="password" id="password" placeholder="Digite sua senha" required>
+                        </div>
+                        
+                        <div class="form-options">
+                            <label class="checkbox">
+                                <input type="checkbox" id="remember-me">
+                                <span>Lembrar de mim</span>
+                            </label>
+                            <a href="#" class="forgot-password">Esqueci a senha</a>
+                        </div>
+                        
+                        <button type="submit" class="login-btn">
+                            <i class="fas fa-sign-in-alt"></i> Entrar
+                        </button>
+                        
+                        <div class="register-link">
+                            Não tem uma conta? <a href="#">Registre-se</a>
+                        </div>
+                    </form>
+                    
+                    <div class="demo-credentials">
+                        <h4>Credenciais de demonstração:</h4>
+                        <p>Usuário: <strong>demo</strong></p>
+                        <p>Senha: <strong>demo123</strong></p>
                     </div>
                 </div>
-            </div>
-
-            <!-- Mensagem de erro -->
-            <div class="error-container" id="error-container">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>Cidade não encontrada</h3>
-                <p id="error-message">Não foi possível encontrar a cidade digitada. Verifique a ortografia e tente novamente.</p>
-                <button id="try-again-btn">Tentar Novamente</button>
-            </div>
+            </section>
         </main>
 
+        <!-- Rodapé -->
         <footer>
-            <p>Desenvolvido para projeto de curso | Dados fornecidos pela <a href="https://openweathermap.org/" target="_blank">OpenWeatherMap API</a></p>
-            <p class="api-note">⚠️ Para rodar localmente, você precisará de uma chave de API gratuita</p>
+            <p>Harmony Player &copy; <span id="current-year">2025</span> - Desenvolvido com <i class="fas fa-heart"></i> para amantes de música</p>
         </footer>
     </div>
-    
-    <script src="src/js/script.js"></script>
+
+    <!-- Elemento de áudio -->
+    <audio id="audio-player">
+        <source src="src/assets/música/Everything is romantic featuring caroline polachek.mp3" type="audio/mpeg">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+
+    <script src="src/public/js/script.js"></script>
 </body>
 </html>
