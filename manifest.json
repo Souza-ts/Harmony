@@ -1,0 +1,185 @@
+{
+  "name": "Harmony Player",
+  "short_name": "Harmony",
+  "description": "Player de música premium com sincronização perfeita de letras. Sinta a música como nunca antes.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "theme_color": "#0a0a0a",
+  "background_color": "#0a0a0a",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay"],
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "start_url": "/",
+  "id": "/",
+  "categories": ["music", "entertainment", "utilities"],
+  "screenshots": [
+    {
+      "src": "assets/screenshots/screenshot-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Harmony Player - Player Principal"
+    },
+    {
+      "src": "assets/screenshots/screenshot-2.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Harmony Player - Mobile View"
+    }
+  ],
+  "icons": [
+    {
+      "src": "assets/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Iniciar Reprodução",
+      "short_name": "Tocar",
+      "description": "Iniciar ou pausar a reprodução atual",
+      "url": "/?action=play",
+      "icons": [{ "src": "assets/icons/play-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Ver Letras",
+      "short_name": "Letras",
+      "description": "Abrir página de letras sincronizadas",
+      "url": "/?page=lyrics",
+      "icons": [{ "src": "assets/icons/lyrics-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Visualizador",
+      "short_name": "Visualizar",
+      "description": "Abrir visualizador de áudio",
+      "url": "/?page=visualizer",
+      "icons": [{ "src": "assets/icons/visualizer-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+harmony",
+      "url": "/?audio=%s"
+    },
+    {
+      "protocol": "harmony",
+      "url": "/?audio=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/?audio=%s",
+      "accept": {
+        "audio/mpeg": [".mp3"],
+        "audio/ogg": [".ogg", ".oga"],
+        "audio/wav": [".wav"],
+        "audio/flac": [".flac"],
+        "audio/aac": [".aac", ".m4a"],
+        "audio/webm": [".webm"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/?share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "handle_links": "preferred",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+  "launch_handler": {
+    "client_mode": ["auto", "focus-existing", "navigate-new", "navigate-existing"]
+  },
+  "permissions": [
+    "audio-capture",
+    "storage",
+    "notifications",
+    "background-sync",
+    "clipboard-write"
+  ],
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "serviceworker": {
+    "src": "service-worker.js",
+    "scope": "/",
+    "use_cache": true
+  },
+  "platform": "webapp",
+  "iarc_rating_id": "e10e6b81-8c21-49c9-8b4a-2b6c9d7b8c9d",
+  "features": [
+    "audio",
+    "media-session",
+    "picture-in-picture",
+    "cross-origin-isolated",
+    "shared-array-buffer"
+  ],
+  "manifest_version": 3,
+  "version": "2.0.0",
+  "author": "Harmony Audio Systems",
+  "homepage_url": "https://harmony-player.app",
+  "developer": {
+    "name": "Harmony Audio Systems",
+    "url": "https://harmony-player.app"
+  }
+}
