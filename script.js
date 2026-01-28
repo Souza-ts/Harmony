@@ -13,13 +13,11 @@ let startSeconds = 0;
 let totalSeconds = 0;
 let rafId = null;
 
-/* "2m 4s" → segundos */
 function parseTime(time) {
   const match = time?.match(/(\d+)m\s*(\d+)s/);
   return match ? Number(match[1]) * 60 + Number(match[2]) : 0;
 }
 
-/* segundos → m:ss */
 function format(sec) {
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
@@ -58,7 +56,6 @@ function updateUI(data) {
   startTimestamp = Date.now();
   startProgress();
 
-  /* background */
   if (data.cores) {
     document.body.style.setProperty(
       "--bg-gradient",
@@ -71,12 +68,10 @@ function updateUI(data) {
   }
 }
 
-/* inicial */
 fetch(API_URL)
   .then(r => r.json())
   .then(updateUI);
 
-/* websocket */
 const ws = new WebSocket(WS_URL);
 ws.onmessage = e => {
   const msg = JSON.parse(e.data);
