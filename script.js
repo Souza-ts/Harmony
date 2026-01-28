@@ -1,73 +1,64 @@
-const API_URL = "https://ocean-q2uw.onrender.com/music"; // ajuste se precisar
+const API_URL = "https://ocean-q2uw.onrender.com/music";
+const WS_URL = "wss://ocean-q2uw.onrender.com";
 
-let currentSeconds = 0;
-let totalSeconds = 0;
-let timerInterval = null;
+const cover = document.getElementById("cover");
+const title = document.getElementById("title");
+const artist = document.getElementById("artist");
+const current = document.getElementById("current");
+const duration = document.getElementById("duration");
+const fill = document.getElementById("fill");
+const player = document.getElementById("player");
 
-/* Converte 2m 20s → 2:20 */
-function formatTime(raw) {
-  const match = raw.match(/(?:(\d+)m)?\s*(?:(\d+)s)?/i);
-  const m = Number(match?.[1] || 0);
-  const s = Number(match?.[2] || 0);
-  return {
-    formatted: `${m}:${String(s).padStart(2, "0")}`,
-    seconds: m * 60 + s
-  };
+/* Converte "2m 4s" → "2:04" */
+function formatTime(time) {
+  if (!time) return "0:00";
+
+  const match = time.match(/(\d+)m\s*(\d+)s/);
+  if (!match) return time;
+
+  const minutes = Number(match[1]);
+  const seconds = Number(match[2]);
+
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
-async function loadNowPlaying() {
-  const res = await fetch(API_URL);
-  const data = await res.json();
-
-  document.getElementById("title").textContent = data.titulo;
-  document.getElementById("artist").textContent = data.artista;
-  document.getElementById("cover").src = data.capa;
-
-  const duration = formatTime(data.duracao);
-  const current = formatTime(data.tempoAtual);
-
-  totalSeconds = duration.seconds;
-  currentSeconds = current.seconds;
-
-  document.getElementById("duration").textContent = duration.formatted;
-  document.getElementById("current").textContent = current.formatted;
-
-  applyBackground(data.cores);
-  startTimer();
+/* Converte "mm:ss" → segundos */
+function timeToSeconds(time) {
+  const [m, s] = time.split(":").map(Number);
+  return m * 60 + s;
 }
 
-function applyBackground(colors) {
-  const bg = document.getElementById("background");
+function updateUI(data) {
+  const currentFormatted = formatTime(data.tempoAtual);
+  const durationFormatted = formatTime(data.duracao);
 
-  bg.style.background = `
-    linear-gradient(
-      120deg,
-      ${colors.primary},
-      ${colors.secondary}
-    )
-  `;
+  cover.src = data.capa;
+  title.textContent = data.titulo;
+  artist.textContent = data.artista;
+  current.textContent = currentFormatted;
+  duration.textContent = durationFormatted;
+
+  const progress =
+    (timeToSeconds(currentFormatted) /
+      timeToSeconds(durationFormatted)) * 100;
+
+  fill.style.width = `${progress}%`;
+  player.style.background = data.cores?.dominante || "#18181d";
 }
 
-function startTimer() {
-  clearInterval(timerInterval);
+/* Estado inicial */
+fetch(API_URL)
+  .then(res => res.json())
+  .then(updateUI)
+  .catch(() => {});
 
-  timerInterval = setInterval(() => {
-    if (currentSeconds >= totalSeconds) return;
+/* WebSocket */
+const ws = new WebSocket(WS_URL);
 
-    currentSeconds++;
+ws.onmessage = (event) => {
+  const msg = JSON.parse(event.data);
 
-    const m = Math.floor(currentSeconds / 60);
-    const s = currentSeconds % 60;
-
-    document.getElementById("current").textContent =
-      `${m}:${String(s).padStart(2, "0")}`;
-
-    const progress = (currentSeconds / totalSeconds) * 100;
-    document.querySelector(".progress").style.width = `${progress}%`;
-  }, 1000);
-}
-
-/* Atualiza a música automaticamente a cada 5s */
-setInterval(loadNowPlaying, 5000);
-
-loadNowPlaying();
+  if (msg.type === "music_update") {
+    updateUI(msg.data);
+  }
+};
