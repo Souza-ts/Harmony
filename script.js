@@ -8,41 +8,40 @@ const current = document.getElementById("current");
 const duration = document.getElementById("duration");
 const fill = document.getElementById("fill");
 
-let currentSeconds = 0;
+let startTimestamp = 0;
+let startSeconds = 0;
 let totalSeconds = 0;
-let timer = null;
+let rafId = null;
 
 /* "2m 4s" → segundos */
 function parseTime(time) {
-  if (!time) return 0;
-
-  const match = time.match(/(\d+)m\s*(\d+)s/);
-  if (!match) return 0;
-
-  return Number(match[1]) * 60 + Number(match[2]);
+  const match = time?.match(/(\d+)m\s*(\d+)s/);
+  return match ? Number(match[1]) * 60 + Number(match[2]) : 0;
 }
 
-/* segundos → "m:ss" */
-function formatSeconds(sec) {
+/* segundos → m:ss */
+function format(sec) {
   const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  const s = Math.floor(sec % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-/* Inicia / reinicia o timer */
-function startTimer() {
-  if (timer) clearInterval(timer);
+function startProgress() {
+  cancelAnimationFrame(rafId);
 
-  timer = setInterval(() => {
-    if (currentSeconds >= totalSeconds) return;
+  function tick() {
+    const elapsed = (Date.now() - startTimestamp) / 1000;
+    const currentSec = Math.min(startSeconds + elapsed, totalSeconds);
 
-    currentSeconds++;
+    current.textContent = format(currentSec);
+    fill.style.width = `${(currentSec / totalSeconds) * 100}%`;
 
-    current.textContent = formatSeconds(currentSeconds);
+    if (currentSec < totalSeconds) {
+      rafId = requestAnimationFrame(tick);
+    }
+  }
 
-    const progress = (currentSeconds / totalSeconds) * 100;
-    fill.style.width = `${progress}%`;
-  }, 1000);
+  rafId = requestAnimationFrame(tick);
 }
 
 function updateUI(data) {
@@ -50,17 +49,16 @@ function updateUI(data) {
   title.textContent = data.titulo;
   artist.textContent = data.artista;
 
-  currentSeconds = parseTime(data.tempoAtual);
+  startSeconds = parseTime(data.tempoAtual);
   totalSeconds = parseTime(data.duracao);
 
-  current.textContent = formatSeconds(currentSeconds);
-  duration.textContent = formatSeconds(totalSeconds);
+  current.textContent = format(startSeconds);
+  duration.textContent = format(totalSeconds);
 
-  fill.style.width = `${(currentSeconds / totalSeconds) * 100}%`;
+  startTimestamp = Date.now();
+  startProgress();
 
-  startTimer();
-
-  /* Background */
+  /* background */
   if (data.cores) {
     document.body.style.setProperty(
       "--bg-gradient",
@@ -73,18 +71,15 @@ function updateUI(data) {
   }
 }
 
-/* Estado inicial */
+/* inicial */
 fetch(API_URL)
-  .then(res => res.json())
-  .then(updateUI)
-  .catch(() => {});
+  .then(r => r.json())
+  .then(updateUI);
 
-/* WebSocket */
+/* websocket */
 const ws = new WebSocket(WS_URL);
-
-ws.onmessage = (event) => {
-  const msg = JSON.parse(event.data);
-
+ws.onmessage = e => {
+  const msg = JSON.parse(e.data);
   if (msg.type === "music_update") {
     updateUI(msg.data);
   }
