@@ -16,13 +16,10 @@ function formatTime(time) {
   const match = time.match(/(\d+)m\s*(\d+)s/);
   if (!match) return time;
 
-  const minutes = Number(match[1]);
-  const seconds = Number(match[2]);
-
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  return `${match[1]}:${match[2].padStart(2, "0")}`;
 }
 
-/* Converte "mm:ss" → segundos */
+/* "mm:ss" → segundos */
 function timeToSeconds(time) {
   const [m, s] = time.split(":").map(Number);
   return m * 60 + s;
@@ -43,7 +40,18 @@ function updateUI(data) {
       timeToSeconds(durationFormatted)) * 100;
 
   fill.style.width = `${progress}%`;
-  player.style.background = data.cores?.dominante || "#18181d";
+
+  /* GRADIENT DINÂMICO */
+  if (data.cores) {
+    player.style.setProperty(
+      "--gradient",
+      `linear-gradient(135deg,
+        ${data.cores.escura},
+        ${data.cores.dominante},
+        ${data.cores.clara}
+      )`
+    );
+  }
 }
 
 /* Estado inicial */
@@ -57,7 +65,6 @@ const ws = new WebSocket(WS_URL);
 
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data);
-
   if (msg.type === "music_update") {
     updateUI(msg.data);
   }
