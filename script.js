@@ -7,41 +7,60 @@ const artist = document.getElementById("artist");
 const current = document.getElementById("current");
 const duration = document.getElementById("duration");
 const fill = document.getElementById("fill");
-const player = document.getElementById("player");
 
-/* Converte "2m 4s" → "2:04" */
-function formatTime(time) {
-  if (!time) return "0:00";
+let currentSeconds = 0;
+let totalSeconds = 0;
+let timer = null;
+
+/* "2m 4s" → segundos */
+function parseTime(time) {
+  if (!time) return 0;
 
   const match = time.match(/(\d+)m\s*(\d+)s/);
-  if (!match) return time;
+  if (!match) return 0;
 
-  return `${match[1]}:${match[2].padStart(2, "0")}`;
+  return Number(match[1]) * 60 + Number(match[2]);
 }
 
-/* "mm:ss" → segundos */
-function timeToSeconds(time) {
-  const [m, s] = time.split(":").map(Number);
-  return m * 60 + s;
+/* segundos → "m:ss" */
+function formatSeconds(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+/* Inicia / reinicia o timer */
+function startTimer() {
+  if (timer) clearInterval(timer);
+
+  timer = setInterval(() => {
+    if (currentSeconds >= totalSeconds) return;
+
+    currentSeconds++;
+
+    current.textContent = formatSeconds(currentSeconds);
+
+    const progress = (currentSeconds / totalSeconds) * 100;
+    fill.style.width = `${progress}%`;
+  }, 1000);
 }
 
 function updateUI(data) {
-  const currentFormatted = formatTime(data.tempoAtual);
-  const durationFormatted = formatTime(data.duracao);
-
   cover.src = data.capa;
   title.textContent = data.titulo;
   artist.textContent = data.artista;
-  current.textContent = currentFormatted;
-  duration.textContent = durationFormatted;
 
-  const progress =
-    (timeToSeconds(currentFormatted) /
-      timeToSeconds(durationFormatted)) * 100;
+  currentSeconds = parseTime(data.tempoAtual);
+  totalSeconds = parseTime(data.duracao);
 
-  fill.style.width = `${progress}%`;
+  current.textContent = formatSeconds(currentSeconds);
+  duration.textContent = formatSeconds(totalSeconds);
 
-  /* CORES NO BACKGROUND (BODY) */
+  fill.style.width = `${(currentSeconds / totalSeconds) * 100}%`;
+
+  startTimer();
+
+  /* Background */
   if (data.cores) {
     document.body.style.setProperty(
       "--bg-gradient",
@@ -65,6 +84,7 @@ const ws = new WebSocket(WS_URL);
 
 ws.onmessage = (event) => {
   const msg = JSON.parse(event.data);
+
   if (msg.type === "music_update") {
     updateUI(msg.data);
   }
