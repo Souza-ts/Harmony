@@ -41,10 +41,10 @@ function updateUI(data) {
 
   fill.style.width = `${progress}%`;
 
-  /* GRADIENT DINÂMICO */
+  /* CORES NO BACKGROUND (BODY) */
   if (data.cores) {
-    player.style.setProperty(
-      "--gradient",
+    document.body.style.setProperty(
+      "--bg-gradient",
       `linear-gradient(135deg,
         ${data.cores.escura},
         ${data.cores.dominante},

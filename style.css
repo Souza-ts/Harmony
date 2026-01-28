@@ -6,42 +6,42 @@
 }
 
 body {
+  position: relative;
   background: #0f0f12;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  overflow: hidden;
 }
 
-/* PLAYER */
+/* FUNDO COLORIDO COM BLUR */
+body::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: var(--bg-gradient, #0f0f12);
+  filter: blur(60px);
+  animation: bgMove 18s ease infinite;
+  z-index: -1;
+  opacity: 0.9;
+}
+
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* CARD */
 .player {
-  position: relative;
+  background: #18181d;
   padding: 24px;
   border-radius: 20px;
   width: 320px;
   text-align: center;
   color: white;
-  overflow: hidden;
-}
-
-/* FUNDO COM BLUR */
-.player::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--gradient, #18181d);
-  filter: blur(22px);
-  transform: scale(1.2);
-  animation: gradientMove 12s ease infinite;
-  z-index: -1;
-  opacity: 0.9;
-}
-
-/* GRADIENT ANIMADO */
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 .player img {
@@ -56,7 +56,7 @@ h1 {
 
 h2 {
   font-size: 0.9rem;
-  opacity: 0.75;
+  opacity: 0.7;
   margin-bottom: 16px;
 }
 
@@ -71,19 +71,19 @@ h2 {
 .bar {
   flex: 1;
   height: 6px;
-  background: rgba(255, 255, 255, 0.25);
+  background: #2a2a33;
   border-radius: 999px;
   overflow: hidden;
 }
 
-/* BARRA ANIMADA */
+/* PROGRESS BAR ANIMADA */
 #fill {
   height: 100%;
   width: 0%;
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,0.9),
-    rgba(255,255,255,0.6)
+    #ffffff,
+    #d9d9d9
   );
   border-radius: inherit;
   transition: width 0.6s ease;
