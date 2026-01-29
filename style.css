@@ -17,6 +17,7 @@ body {
   isolation: isolate;
 }
 
+/* 🌈 Background blur com gradiente da capa */
 body::before {
   content: "";
   position: fixed;
@@ -43,17 +44,24 @@ body::before {
   100% { background-position: 0% 50%; }
 }
 
+/* 🧱 Layout */
+.container.horizontal {
+  display: grid;
+  grid-template-columns: 320px 420px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* 🎵 Player */
 .player {
   background: #18181d;
   padding: 24px;
-  width: 320px;
   border-radius: 20px;
 
   color: white;
   text-align: center;
 
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.55);
-  z-index: 1;
 }
 
 .player img {
@@ -84,6 +92,7 @@ h1 {
   opacity: 0.5;
 }
 
+/* ⏱️ Progresso */
 .progress {
   display: flex;
   align-items: center;
@@ -96,7 +105,6 @@ h1 {
 .bar {
   flex: 1;
   height: 6px;
-
   background: #2a2a33;
   border-radius: 999px;
   overflow: hidden;
@@ -105,7 +113,67 @@ h1 {
 #fill {
   height: 100%;
   width: 0%;
-
   background: linear-gradient(90deg, #ffffff, #d9d9d9);
   border-radius: inherit;
+}
+
+/* 🎤 Letras */
+.lyrics-panel {
+  background: rgba(24, 24, 29, 0.85);
+  border-radius: 20px;
+  padding: 20px;
+
+  height: 420px;
+  overflow: hidden;
+
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.lyrics {
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  font-size: 0.95rem;
+  line-height: 1.7;
+
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.lyrics.empty {
+  opacity: 0.5;
+  text-align: center;
+}
+
+/* Linha */
+.lyrics .line {
+  padding: 6px 0;
+  transition: color 0.25s, transform 0.25s;
+}
+
+.lyrics .line.active {
+  color: #ffffff;
+  font-weight: 600;
+  transform: scale(1.03);
+}
+
+/* Scroll */
+.lyrics::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lyrics::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+/* 📱 Responsivo */
+@media (max-width: 900px) {
+  .container.horizontal {
+    grid-template-columns: 1fr;
+  }
+
+  .lyrics-panel {
+    height: 260px;
+  }
 }

@@ -8,22 +8,33 @@
 </head>
 <body>
 
-  <main class="player" id="player">
-    <img id="cover" />
-    <h1 id="title">Nada tocando</h1>
-    <h2 class="meta">
-     <span id="artist"></span>
-     <span class="dot">•</span>
-     <span id="album"></span>
-</h2>
+  <main class="container horizontal">
 
-    <div class="progress">
-      <span id="current">0:00</span>
-      <div class="bar">
-        <div id="fill"></div>
+    <section class="player" id="player">
+      <img id="cover" />
+      <h1 id="title">Nada tocando</h1>
+
+      <h2 class="meta">
+        <span id="artist"></span>
+        <span class="dot">•</span>
+        <span id="album"></span>
+      </h2>
+
+      <div class="progress">
+        <span id="current">0:00</span>
+        <div class="bar">
+          <div id="fill"></div>
+        </div>
+        <span id="duration">0:00</span>
       </div>
-      <span id="duration">0:00</span>
-    </div>
+    </section>
+
+    <section class="lyrics-panel">
+      <div id="lyrics" class="lyrics empty">
+        Nenhuma letra disponível
+      </div>
+    </section>
+
   </main>
 
   <script src="script.js"></script>

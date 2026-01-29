@@ -8,6 +8,7 @@ const artist = document.getElementById("artist");
 const current = document.getElementById("current");
 const duration = document.getElementById("duration");
 const fill = document.getElementById("fill");
+const lyricsEl = document.getElementById("lyrics");
 
 let startTimestamp = 0;
 let startMs = 0;
@@ -15,30 +16,28 @@ let totalMs = 0;
 let rafId = null;
 let lastTrackId = null;
 
-function parseMs(value) {
-  if (typeof value === "number") return value;
-  if (typeof value === "string" && /^\d+$/.test(value)) return Number(value);
+/* ⏱️ Tempo em ms */
+function parseMs(v) {
+  if (typeof v === "number") return v;
+  if (typeof v === "string" && /^\d+$/.test(v)) return Number(v);
   return 0;
 }
 
 function formatMs(ms) {
-  const totalSeconds = Math.floor(ms / 1000);
-  const m = Math.floor(totalSeconds / 60);
-  const s = totalSeconds % 60;
-  return `${m}:${String(s).padStart(2, "0")}`;
+  const s = Math.floor(ms / 1000);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
+/* ▶️ Progresso */
 function startProgress() {
   cancelAnimationFrame(rafId);
 
   function tick() {
-    const elapsedMs = Date.now() - startTimestamp;
-    const currentMs = Math.min(startMs + elapsedMs, totalMs);
+    const elapsed = Date.now() - startTimestamp;
+    const currentMs = Math.min(startMs + elapsed, totalMs);
 
     current.textContent = formatMs(currentMs);
-    fill.style.width = totalMs
-      ? `${(currentMs / totalMs) * 100}%`
-      : "0%";
+    fill.style.width = totalMs ? `${(currentMs / totalMs) * 100}%` : "0%";
 
     if (currentMs < totalMs) {
       rafId = requestAnimationFrame(tick);
@@ -48,6 +47,26 @@ function startProgress() {
   rafId = requestAnimationFrame(tick);
 }
 
+/* 🎤 Letras */
+function renderLyrics(lyrics) {
+  if (!lyrics) {
+    lyricsEl.className = "lyrics empty";
+    lyricsEl.textContent = "Nenhuma letra disponível";
+    return;
+  }
+
+  lyricsEl.className = "lyrics";
+  lyricsEl.innerHTML = "";
+
+  lyrics.split("\n").forEach(line => {
+    const div = document.createElement("div");
+    div.className = "line";
+    div.textContent = line.replace(/\[.*?\]/g, "").trim();
+    lyricsEl.appendChild(div);
+  });
+}
+
+/* 🔄 UI */
 function updateUI(data) {
   if (!data || !data.titulo) return;
 
@@ -62,19 +81,18 @@ function updateUI(data) {
     document.body.style.setProperty(
       "--bg-gradient",
       `linear-gradient(135deg,
-        ${data.cores.escura},
+        ${data.cores.escura || data.cores.dominante},
         ${data.cores.dominante},
-        ${data.cores.clara}
+        ${data.cores.clara || data.cores.dominante}
       )`
     );
   }
 
-  const newStartMs = parseMs(data.tempoAtual);
-  const newTotalMs = parseMs(data.duracao);
+  renderLyrics(data.lyrics);
 
   if (trackId !== lastTrackId) {
-    startMs = newStartMs;
-    totalMs = newTotalMs;
+    startMs = parseMs(data.tempoAtual);
+    totalMs = parseMs(data.duracao);
 
     current.textContent = formatMs(startMs);
     duration.textContent = formatMs(totalMs);
@@ -86,19 +104,10 @@ function updateUI(data) {
   }
 }
 
-fetch(API_URL)
-  .then(r => r.json())
-  .then(updateUI)
-  .catch(() => {});
+fetch(API_URL).then(r => r.json()).then(updateUI).catch(() => {});
 
 const ws = new WebSocket(WS_URL);
-
-ws.onmessage = (e) => {
+ws.onmessage = e => {
   const msg = JSON.parse(e.data);
-  if (msg.type === "music_update") {
-    updateUI(msg.data);
-  }
+  if (msg.type === "music_update") updateUI(msg.data);
 };
-
-ws.onerror = () => console.error("Erro no WebSocket");
-ws.onclose = () => console.warn("WebSocket desconectado");
