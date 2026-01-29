@@ -1,42 +1,36 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Now Playing</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <main class="container horizontal">
+<div class="background" id="background"></div>
 
-    <section class="player" id="player">
-      <img id="cover" />
-      <h1 id="title">Nada tocando</h1>
+<main class="app">
 
-      <h2 class="meta">
-        <span id="artist"></span>
-        <span class="dot">•</span>
-        <span id="album"></span>
-      </h2>
+  <!-- PLAYER -->
+  <section class="player">
+    <img id="cover" class="cover">
 
-      <div class="progress">
-        <span id="current">0:00</span>
-        <div class="bar">
-          <div id="fill"></div>
-        </div>
-        <span id="duration">0:00</span>
-      </div>
-    </section>
+    <h2 id="title">Nada tocando</h2>
+    <p id="artist">—</p>
 
-    <section class="lyrics-panel">
-      <div id="lyrics" class="lyrics empty">
-        Nenhuma letra disponível
-      </div>
-    </section>
+    <div class="controls">
+      ⏮ ▶ ⏭
+    </div>
+  </section>
 
-  </main>
+  <!-- LETRAS -->
+  <section class="lyrics" id="lyrics">
+    <p class="empty">Nenhuma letra disponível</p>
+  </section>
 
-  <script src="script.js"></script>
+</main>
+
+<script src="script.js"></script>
 </body>
 </html>

@@ -1,113 +1,100 @@
 const API_URL = "https://ocean-q2uw.onrender.com/music";
-const WS_URL = "wss://ocean-q2uw.onrender.com";
 
 const cover = document.getElementById("cover");
 const title = document.getElementById("title");
-const album = document.getElementById("album");
 const artist = document.getElementById("artist");
-const current = document.getElementById("current");
-const duration = document.getElementById("duration");
-const fill = document.getElementById("fill");
 const lyricsEl = document.getElementById("lyrics");
+const background = document.getElementById("background");
 
-let startTimestamp = 0;
-let startMs = 0;
-let totalMs = 0;
-let rafId = null;
-let lastTrackId = null;
+let lastMusicId = null;
+let currentLine = -1;
 
-/* ⏱️ Tempo em ms */
-function parseMs(v) {
-  if (typeof v === "number") return v;
-  if (typeof v === "string" && /^\d+$/.test(v)) return Number(v);
-  return 0;
+/* Atualiza UI */
+function updatePlayer(music) {
+  title.textContent = music.titulo;
+  artist.textContent = `${music.artista}${music.album ? " • " + music.album : ""}`;
+  cover.src = music.capa;
+
+  /* GRADIENTE COM CORES DA CAPA */
+  const { dominante, escura, clara } = music.cores;
+
+  background.style.background = `
+    radial-gradient(circle at top left, ${clara || dominante}, transparent 60%),
+    radial-gradient(circle at bottom right, ${escura || dominante}, transparent 60%),
+    linear-gradient(120deg, ${dominante}, ${escura || dominante})
+  `;
+
+  renderLyrics(music.lyrics || []);
 }
 
-function formatMs(ms) {
-  const s = Math.floor(ms / 1000);
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-}
-
-/* ▶️ Progresso */
-function startProgress() {
-  cancelAnimationFrame(rafId);
-
-  function tick() {
-    const elapsed = Date.now() - startTimestamp;
-    const currentMs = Math.min(startMs + elapsed, totalMs);
-
-    current.textContent = formatMs(currentMs);
-    fill.style.width = totalMs ? `${(currentMs / totalMs) * 100}%` : "0%";
-
-    if (currentMs < totalMs) {
-      rafId = requestAnimationFrame(tick);
-    }
-  }
-
-  rafId = requestAnimationFrame(tick);
-}
-
-/* 🎤 Letras */
+/* Renderiza letras */
 function renderLyrics(lyrics) {
-  if (!lyrics) {
-    lyricsEl.className = "lyrics empty";
-    lyricsEl.textContent = "Nenhuma letra disponível";
+  lyricsEl.innerHTML = "";
+
+  if (!lyrics.length) {
+    lyricsEl.innerHTML = `<p class="empty">Nenhuma letra disponível</p>`;
     return;
   }
 
-  lyricsEl.className = "lyrics";
-  lyricsEl.innerHTML = "";
-
-  lyrics.split("\n").forEach(line => {
+  lyrics.forEach(l => {
     const div = document.createElement("div");
     div.className = "line";
-    div.textContent = line.replace(/\[.*?\]/g, "").trim();
+    div.dataset.time = l.time; // segundos
+    div.textContent = l.text;
     lyricsEl.appendChild(div);
+  });
+
+  currentLine = -1;
+}
+
+/* Sincronização */
+function syncLyrics(currentTime) {
+  const lines = document.querySelectorAll(".line");
+
+  lines.forEach((line, i) => {
+    const time = Number(line.dataset.time);
+    const nextTime = lines[i + 1]
+      ? Number(lines[i + 1].dataset.time)
+      : Infinity;
+
+    if (currentTime >= time && currentTime < nextTime) {
+      if (currentLine !== i) {
+        if (lines[currentLine]) {
+          lines[currentLine].classList.remove("active");
+        }
+
+        line.classList.add("active");
+        currentLine = i;
+
+        line.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }
+    }
   });
 }
 
-/* 🔄 UI */
-function updateUI(data) {
-  if (!data || !data.titulo) return;
+/* Busca música atual */
+async function fetchMusic() {
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) return;
 
-  const trackId = `${data.titulo}-${data.artista}-${data.album}`;
+    const music = await res.json();
 
-  cover.src = data.capa;
-  title.textContent = data.titulo;
-  artist.textContent = data.artista;
-  album.textContent = data.album || "Single";
+    if (music.nome !== lastMusicId) {
+      lastMusicId = music.nome;
+      updatePlayer(music);
+    }
 
-  if (data.cores) {
-    document.body.style.setProperty(
-      "--bg-gradient",
-      `linear-gradient(135deg,
-        ${data.cores.escura || data.cores.dominante},
-        ${data.cores.dominante},
-        ${data.cores.clara || data.cores.dominante}
-      )`
-    );
-  }
+    /* tempoAtual vem em MS */
+    syncLyrics(Math.floor(music.tempoAtual / 1000));
 
-  renderLyrics(data.lyrics);
-
-  if (trackId !== lastTrackId) {
-    startMs = parseMs(data.tempoAtual);
-    totalMs = parseMs(data.duracao);
-
-    current.textContent = formatMs(startMs);
-    duration.textContent = formatMs(totalMs);
-
-    startTimestamp = Date.now();
-    startProgress();
-
-    lastTrackId = trackId;
+  } catch (err) {
+    console.error("Erro ao buscar música:", err);
   }
 }
 
-fetch(API_URL).then(r => r.json()).then(updateUI).catch(() => {});
-
-const ws = new WebSocket(WS_URL);
-ws.onmessage = e => {
-  const msg = JSON.parse(e.data);
-  if (msg.type === "music_update") updateUI(msg.data);
-};
+/* Atualiza a cada 1s */
+setInterval(fetchMusic, 1000);

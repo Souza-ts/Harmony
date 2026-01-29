@@ -6,174 +6,88 @@
 }
 
 body {
-  min-height: 100vh;
-  background: #0f0f12;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  position: relative;
-  isolation: isolate;
-}
-
-/* 🌈 Background blur com gradiente da capa */
-body::before {
-  content: "";
-  position: fixed;
-  inset: -30%;
-
-  background: var(
-    --bg-gradient,
-    linear-gradient(135deg, #0f0f12, #0f0f12)
-  );
-  background-size: 400% 400%;
-
-  filter: blur(80px);
-  opacity: 0.95;
-
-  z-index: -1;
-  pointer-events: none;
-
-  animation: bgMove 20s ease infinite;
-}
-
-@keyframes bgMove {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* 🧱 Layout */
-.container.horizontal {
-  display: grid;
-  grid-template-columns: 320px 420px;
-  gap: 24px;
-  align-items: start;
-}
-
-/* 🎵 Player */
-.player {
-  background: #18181d;
-  padding: 24px;
-  border-radius: 20px;
-
+  height: 100vh;
+  overflow: hidden;
   color: white;
-  text-align: center;
-
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.55);
 }
 
-.player img {
+/* BACKGROUND GRADIENT */
+.background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  filter: blur(90px) brightness(0.75);
+  transform: scale(1.3);
+  transition: background 0.6s ease;
+}
+
+/* LAYOUT */
+.app {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  padding: 60px;
+  gap: 60px;
+}
+
+/* PLAYER */
+.player {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cover {
   width: 100%;
   border-radius: 14px;
-  margin-bottom: 16px;
-  user-select: none;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6);
 }
 
-h1 {
-  font-size: 1.15rem;
-  line-height: 1.3;
-}
-
-.meta {
-  font-size: 0.9rem;
-  opacity: 0.7;
-  margin-bottom: 18px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.meta .dot {
-  opacity: 0.5;
-}
-
-/* ⏱️ Progresso */
-.progress {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  font-size: 0.75rem;
-  user-select: none;
-}
-
-.bar {
-  flex: 1;
-  height: 6px;
-  background: #2a2a33;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-#fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #ffffff, #d9d9d9);
-  border-radius: inherit;
-}
-
-/* 🎤 Letras */
-.lyrics-panel {
-  background: rgba(24, 24, 29, 0.85);
-  border-radius: 20px;
-  padding: 20px;
-
-  height: 420px;
-  overflow: hidden;
-
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-}
-
-.lyrics {
-  height: 100%;
-  overflow-y: auto;
-  padding-right: 8px;
-
-  font-size: 0.95rem;
-  line-height: 1.7;
-
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.lyrics.empty {
-  opacity: 0.5;
-  text-align: center;
-}
-
-/* Linha */
-.lyrics .line {
-  padding: 6px 0;
-  transition: color 0.25s, transform 0.25s;
-}
-
-.lyrics .line.active {
-  color: #ffffff;
+.player h2 {
+  font-size: 26px;
   font-weight: 600;
-  transform: scale(1.03);
 }
 
-/* Scroll */
+.player p {
+  opacity: .7;
+}
+
+.controls {
+  margin-top: 10px;
+  font-size: 22px;
+  letter-spacing: 14px;
+  opacity: .9;
+}
+
+/* LETRAS */
+.lyrics {
+  overflow-y: auto;
+  padding-right: 20px;
+}
+
 .lyrics::-webkit-scrollbar {
   width: 6px;
 }
 
 .lyrics::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
+  background: rgba(255,255,255,.25);
+  border-radius: 10px;
 }
 
-/* 📱 Responsivo */
-@media (max-width: 900px) {
-  .container.horizontal {
-    grid-template-columns: 1fr;
-  }
+.line {
+  font-size: 22px;
+  line-height: 1.6;
+  opacity: .35;
+  transition: .3s;
+  margin-bottom: 14px;
+}
 
-  .lyrics-panel {
-    height: 260px;
-  }
+.line.active {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.empty {
+  opacity: .5;
+  font-size: 20px;
 }
