@@ -3,6 +3,7 @@ const WS_URL = "wss://ocean-q2uw.onrender.com";
 
 const cover = document.getElementById("cover");
 const title = document.getElementById("title");
+const album = document.getElementById("album");
 const artist = document.getElementById("artist");
 const current = document.getElementById("current");
 const duration = document.getElementById("duration");
@@ -45,6 +46,7 @@ function startProgress() {
 function updateUI(data) {
   cover.src = data.capa;
   title.textContent = data.titulo;
+  album.textContent = data.album || "Single";
   artist.textContent = data.artista;
 
   startSeconds = parseTime(data.tempoAtual);
