@@ -13,23 +13,11 @@ let startTimestamp = 0;
 let startMs = 0;
 let totalMs = 0;
 let rafId = null;
+let lastTrackId = null;
 
-function parseTimeMs(time) {
-  if (typeof time === "number") return time;
-
-  if (typeof time === "string") {
-    if (time.includes(":")) {
-      const [m, s] = time.split(":").map(Number);
-      return ((m * 60) + s) * 1000;
-    }
-    const match = time.match(/(?:(\d+)m)?\s*(?:(\d+)s)?/);
-    if (match) {
-      const m = Number(match[1] || 0);
-      const s = Number(match[2] || 0);
-      return ((m * 60) + s) * 1000;
-    }
-  }
-
+function parseMs(value) {
+  if (typeof value === "number") return value;
+  if (typeof value === "string" && /^\d+$/.test(value)) return Number(value);
   return 0;
 }
 
@@ -64,47 +52,36 @@ function startProgress() {
 }
 
 function updateUI(data) {
-  if (!data || !data.titulo) {
-    title.textContent = "Nada tocando";
-    artist.textContent = "—";
-    album.textContent = "—";
-    cover.src = "placeholder.png";
-    current.textContent = "0:00";
-    duration.textContent = "0:00";
-    fill.style.width = "0%";
-    cancelAnimationFrame(rafId);
-    return;
-  }
+  if (!data || !data.titulo) return;
+
+  const trackId = `${data.titulo}-${data.artista}-${data.album}`;
 
   cover.src = data.capa;
   title.textContent = data.titulo;
-  album.textContent = data.album || "Single";
   artist.textContent = data.artista;
+  album.textContent = data.album || "Single";
 
-  startMs = parseTimeMs(data.tempoAtual);
-  totalMs = parseTimeMs(data.duracao);
+  const newStartMs = parseMs(data.tempoAtual);
+  const newTotalMs = parseMs(data.duracao);
 
-  current.textContent = formatMs(startMs);
-  duration.textContent = formatMs(totalMs);
+  if (trackId !== lastTrackId) {
+    startMs = newStartMs;
+    totalMs = newTotalMs;
 
-  startTimestamp = Date.now();
-  startProgress();
-  if (data.cores) {
-    document.body.style.setProperty(
-      "--bg-gradient",
-      `linear-gradient(135deg,
-        ${data.cores.escura},
-        ${data.cores.dominante},
-        ${data.cores.clara}
-      )`
-    );
+    current.textContent = formatMs(startMs);
+    duration.textContent = formatMs(totalMs);
+
+    startTimestamp = Date.now();
+    startProgress();
+
+    lastTrackId = trackId;
   }
 }
 
 fetch(API_URL)
   .then(r => r.json())
   .then(updateUI)
-  .catch(() => updateUI(null));
+  .catch(() => {});
 
 const ws = new WebSocket(WS_URL);
 
@@ -115,10 +92,10 @@ ws.onmessage = (e) => {
   }
 };
 
-ws.onclose = () => {
-  console.warn("WebSocket desconectado");
-};
-
 ws.onerror = () => {
   console.error("Erro no WebSocket");
+};
+
+ws.onclose = () => {
+  console.warn("WebSocket desconectado");
 };
