@@ -36,12 +36,9 @@ function startProgress() {
     const currentMs = Math.min(startMs + elapsedMs, totalMs);
 
     current.textContent = formatMs(currentMs);
-
-    if (totalMs > 0) {
-      fill.style.width = `${(currentMs / totalMs) * 100}%`;
-    } else {
-      fill.style.width = "0%";
-    }
+    fill.style.width = totalMs
+      ? `${(currentMs / totalMs) * 100}%`
+      : "0%";
 
     if (currentMs < totalMs) {
       rafId = requestAnimationFrame(tick);
@@ -60,6 +57,17 @@ function updateUI(data) {
   title.textContent = data.titulo;
   artist.textContent = data.artista;
   album.textContent = data.album || "Single";
+
+  if (data.cores) {
+    document.body.style.setProperty(
+      "--bg-gradient",
+      `linear-gradient(135deg,
+        ${data.cores.escura},
+        ${data.cores.dominante},
+        ${data.cores.clara}
+      )`
+    );
+  }
 
   const newStartMs = parseMs(data.tempoAtual);
   const newTotalMs = parseMs(data.duracao);
@@ -92,10 +100,5 @@ ws.onmessage = (e) => {
   }
 };
 
-ws.onerror = () => {
-  console.error("Erro no WebSocket");
-};
-
-ws.onclose = () => {
-  console.warn("WebSocket desconectado");
-};
+ws.onerror = () => console.error("Erro no WebSocket");
+ws.onclose = () => console.warn("WebSocket desconectado");
