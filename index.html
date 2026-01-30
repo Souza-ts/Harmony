@@ -1,36 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Now Playing</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Music Player Clone</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    color: white;
+  }
+  #playerCanvas {
+    border-radius: 20px;
+    width: 900px;
+    height: 400px;
+  }
+</style>
 </head>
 <body>
-
-<div class="background" id="background"></div>
-
-<main class="app">
-
-  <!-- PLAYER -->
-  <section class="player">
-    <img id="cover" class="cover">
-
-    <h2 id="title">Nada tocando</h2>
-    <p id="artist">—</p>
-
-    <div class="controls">
-      ⏮ ▶ ⏭
-    </div>
-  </section>
-
-  <!-- LETRAS -->
-  <section class="lyrics" id="lyrics">
-    <p class="empty">Nenhuma letra disponível</p>
-  </section>
-
-</main>
-
-<script src="script.js"></script>
+<canvas id="playerCanvas" width="900" height="400"></canvas>
+<script src="player.js"></script>
 </body>
 </html>
